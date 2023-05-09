@@ -2,13 +2,72 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { LoginComponent } from './components/login/login.component';
-import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
+import { EmpresaComponent } from './components/empresa/empresa.component';
+import { GestionesComponent } from './components/gestiones/gestiones.component';
+import { CuentasComponent } from './components/cuentas/cuentas.component';
+import { PeriodosComponent } from './components/gestiones/periodos/periodos.component';
+import { MonedasComponent } from './components/monedas/monedas.component';
+import { ComprobantesComponent } from './components/comprobantes/comprobantes.component';
+import { CrearComprobanteComponent } from './components/comprobantes/crear-comprobante/crear-comprobante.component';
+import { ReportesComponent } from './components/reportes/reportes.component';
+
+export const hostUrl = 'http://localhost:8085';
+export const reportUrl = 'http://localhost:8080';
+
+export function abrirReporte({ baseUrlReporte, parameters }: { baseUrlReporte: string, parameters: anyParametersUrl; }) {
+
+  fetch(`${hostUrl}/api/getMyData`, {
+    method: "GET",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token")
+    }
+  }).then((response) => {
+    return response.json();
+  }).then((data) => {
+    const url = getReport({
+      parameters: {
+        "IdUsuario": data.id as string, //Fix reporte
+        "idUsuario": data.id as string,
+        sessionDecorator: "no",
+        chrome: "false",
+        decorate: "no",
+        toolbar: "false",
+        j_username: 'jasperadmin', j_password: 'bitnami',
+        ...parameters
+      },
+      report: baseUrlReporte
+    });
+    window.open(url, "_blank");
+  });
+
+}
+
+export type anyParametersUrl = {
+  [key: string]: string;
+};
+
+export function getReport({ parameters, report }: { parameters: anyParametersUrl, report: string; }) {
+  const url = new URL(`${reportUrl}/${report}`);
+  Object.keys(parameters).forEach(key => url.searchParams.append(key, parameters[key]));
+  return url;
+}
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: '', component: HomeComponent }
-  //{ path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '', component: HomeComponent },
+
+  {
+    path: 'empresa/:id', component: EmpresaComponent, children: [
+      { path: 'configuracion/moneda', component: MonedasComponent },
+      { path: 'reportes', component: ReportesComponent },
+      { path: 'configuracion/comprobantes', component: ComprobantesComponent },
+      { path: 'configuracion/comprobantes/crear', component: CrearComprobanteComponent },
+      { path: 'gestiones', component: GestionesComponent },
+      { path: 'gestiones/:gestion_id/periodos', component: PeriodosComponent },
+      { path: 'cuentas', component: CuentasComponent }
+    ]
+  },
 ];
 
 @NgModule({

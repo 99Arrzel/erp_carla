@@ -1,0 +1,50 @@
+<div class="bg-white">
+
+  <!-- Botones de crear, editar, eliminar y cerrar gestion -->
+  <div class="flex flex-wrap justify-items-center justify-center  gap-2 w-full bg-gray-600 ">
+    <button mat-icon-button color="primary" matTooltip="Crear" (click)="openDialogCrear()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-icon-button color="basic" matTooltip="Editar" (click)="openDialogEditar()"
+      [disabled]="selectedGestion ? false : true">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="openDialogDelete()"
+      [disabled]="selectedGestion?.estado && selectedGestion ? false : true">
+      <mat-icon>delete</mat-icon>
+    </button>
+    <button mat-icon-button color="basic" matTooltip="Cerrar" (click)="openDialogCerrar()"
+      [disabled]="selectedGestion?.estado && selectedGestion ? false : true">
+      <mat-icon>close</mat-icon>
+    </button>
+    <!-- Button para ver periodos -->
+    <button mat-icon-button color="basic" matTooltip="Ver periodos" (click)="openPeriodos()"
+      [disabled]="selectedGestion ? false : true">
+      <mat-icon>date_range</mat-icon>
+    </button>
+    <button mat-icon-button color="basic" matTooltip="Reporte" (click)="openReportes()">
+      <mat-icon>description</mat-icon>
+    </button>
+  </div>
+  <p-table *ngIf="empresa" [value]="empresa.gestiones" selectionMode="single" [(selection)]="selectedGestion">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Fecha de inicio</th>
+        <th>Fecha de fin</th>
+        <th>Estado</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-car>
+      <tr [pSelectableRow]="car">
+        <td>{{car.id}}</td>
+        <td>{{car.nombre}}</td>
+        <td>{{car.fechaInicio | date:'dd/MM/yyyy'}}</td>
+        <td>{{car.fechaFin | date:'dd/MM/yyyy'}}</td>
+        <td>{{car.estado ? 'Activo' : 'Inactivo'}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+</div>

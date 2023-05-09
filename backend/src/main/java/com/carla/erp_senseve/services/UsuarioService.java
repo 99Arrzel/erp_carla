@@ -29,14 +29,17 @@ public class UsuarioService {
         }
         return null;
     }
-
-    public UsuarioModel crearUsuario(UsuarioModel usuario){
+    public Optional<UsuarioModel> crearUsuario(UsuarioModel usuario){
         usuario.setPassword(BCrypt.hashpw(usuario.getPassword(), BCrypt.gensalt()));
-        return usuarioRepository.save(usuario);
+        return Optional.of(usuarioRepository.save(usuario));
     }
     public Optional<UsuarioModel> obtenerPorUsuario(String usuario) throws Exception{
             return usuarioRepository.findByUsuario(usuario);
     }
 
-
+    public UsuarioModel findById(Long idUsuario) {
+        return usuarioRepository.findById(idUsuario).orElseThrow(
+                () -> new RuntimeException("No existe usuario")
+        );
+    }
 }

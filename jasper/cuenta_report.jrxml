@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="cuenta_report" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="fff2c63a-0f9d-480e-846f-fb73de5e35be">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Server ERP"/>
+	<property name="ireport.jasperserver.url" value="http://localhost:8080/"/>
+	<property name="ireport.jasperserver.user" value="kna"/>
+	<property name="ireport.jasperserver.report.resource" value="/Reports/cuenta_report_files/main_jrxml"/>
+	<property name="ireport.jasperserver.reportUnit" value="/Reports/cuenta_report"/>
+	<parameter name="idUsuario" class="java.lang.String"/>
+	<parameter name="idEmpresa" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT c.Codigo,
+	c.Nombre,
+	c.Nivel,
+	e.Nombre as NomEmpresa,
+	u.Usuario
+FROM Cuenta as c, Empresa as e, Usuario as u
+WHERE
+	 e.IdEmpresa = c.IdEmpresa
+	AND
+	u.id = c.IdUsuario
+	AND
+	 c.IdUsuario = $P{idUsuario} 
+	 AND c.IdEmpresa = $P{idEmpresa} 
+ORDER BY INET_ATON(c.Codigo) ASC]]>
+	</queryString>
+	<field name="Codigo" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Codigo"/>
+		<property name="com.jaspersoft.studio.field.label" value="Codigo"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Cuenta"/>
+	</field>
+	<field name="Nombre" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="Nombre"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Cuenta"/>
+	</field>
+	<field name="Nivel" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="Nivel"/>
+		<property name="com.jaspersoft.studio.field.label" value="Nivel"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Cuenta"/>
+	</field>
+	<field name="NomEmpresa" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Nombre"/>
+		<property name="com.jaspersoft.studio.field.label" value="NomEmpresa"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Empresa"/>
+	</field>
+	<field name="Usuario" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Usuario"/>
+		<property name="com.jaspersoft.studio.field.label" value="Usuario"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="Usuario"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="100" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="0" y="30" width="555" height="30" forecolor="#313991" uuid="d460a2e4-e6be-4dfe-8032-8a1323bf1834"/>
+				<textElement textAlignment="Center">
+					<font fontName="Serif" size="16" isBold="true"/>
+					<paragraph lineSpacing="Single"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Empresa:" + $F{NomEmpresa}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="30" forecolor="#313991" uuid="90aa7441-8a8d-4e69-b8f3-68d28c5535f4"/>
+				<textElement textAlignment="Center">
+					<font fontName="Arial Black" size="20"/>
+				</textElement>
+				<text><![CDATA[Reporte de Plan de Cuenta]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="80" width="554" height="20" uuid="10e7157f-e136-426a-a15b-0b5d0e00825c"/>
+				<textElement textAlignment="Right">
+					<font fontName="Franklin Gothic Medium Cond&#xD;&#xA;" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Usuario: "+$F{Usuario}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="0" y="60" width="554" height="20" uuid="c03e610c-8db8-4045-bdf0-8ab981e08b5a"/>
+				<textElement textAlignment="Right">
+					<font fontName="Franklin Gothic Medium Cond&#xD;&#xA;" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fecha Rep.: "+new SimpleDateFormat("dd/MM/yyyy").format(new Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="10" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="10" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement x="0" y="0" width="555" height="20" uuid="0ef52e15-55a8-42db-a59a-22c7ea6b771b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c3fad383-40e2-47f1-92c9-dbc100412427"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[REPT("      ", $F{Nivel})  + $F{Codigo} + " - " + $F{Nombre}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="10" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="14" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<frame>
+				<reportElement x="0" y="0" width="111" height="14" uuid="b972ff37-dc0f-401b-a97c-8105079ba13a"/>
+			</frame>
+			<frame>
+				<reportElement x="111" y="0" width="111" height="14" uuid="4f669c51-ce56-4375-b9b3-e7c9fca780e7"/>
+			</frame>
+			<frame>
+				<reportElement x="222" y="0" width="111" height="14" uuid="87d4351c-7d3b-49de-93e9-482ea5bd730a"/>
+			</frame>
+			<frame>
+				<reportElement x="333" y="0" width="111" height="14" uuid="b6e72b60-e764-4ab0-9557-049ab78217c7">
+					<property name="com.jaspersoft.studio.layout"/>
+				</reportElement>
+			</frame>
+			<frame>
+				<reportElement x="444" y="0" width="111" height="14" uuid="04cfaf0e-e0b7-45d1-85c0-4b13f22b0f81">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+				</reportElement>
+				<textField>
+					<reportElement mode="Transparent" x="0" y="0" width="80" height="14" backcolor="#E6E6E6" uuid="3185601f-bd1d-4432-892d-190dd7ea6283"/>
+					<textElement textAlignment="Right"/>
+					<textFieldExpression><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+				</textField>
+				<textField evaluationTime="Report">
+					<reportElement mode="Transparent" x="80" y="0" width="30" height="14" backcolor="#E6E6E6" uuid="318c0a52-f2ed-422e-b8ce-4342d916ae36">
+						<property name="com.jaspersoft.layout.grid.x" value="-1"/>
+						<property name="com.jaspersoft.layout.grid.y" value="-1"/>
+						<property name="com.jaspersoft.layout.grid.weight.x" value="1.0"/>
+						<property name="com.jaspersoft.layout.grid.weight.y" value="1.0"/>
+						<property name="com.jaspersoft.layout.grid.rowspan" value="1"/>
+						<property name="com.jaspersoft.layout.grid.colspan" value="1"/>
+						<property name="com.jaspersoft.layout.grid.weight.fixed" value="false"/>
+					</reportElement>
+					<textElement textAlignment="Left"/>
+					<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+			</frame>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="10" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,4 +1,39 @@
-<div class="bg-gray-500 h-screen w-screen">
-  
+<div class="bg-gray-500 h-screen w-screen flex justify-center items-center">
 
+  <div class="bg-white p-4 rounded-lg w-[500px]">
+
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Empresa</mat-label>
+      <mat-select [(value)]="empresaSelected">
+        <mat-select-trigger>
+          <span>{{empresaSelected?.nombre}}</span>
+        </mat-select-trigger>
+        <mat-option *ngFor="let empresa of empresas" [value]="empresa">{{empresa.nombre}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Botones de ingresar, crear, editar y eliminar  -->
+    <div
+      class="flex flex-wrap justify-items-center justify-center  gap-2 w-full bg-gray-600 rounded-bl-lg rounded-br-lg">
+      <button mat-icon-button color="primary" matTooltip="Crear" (click)="openDialogCrear()">
+        <mat-icon>add</mat-icon>
+      </button>
+      <button mat-icon-button color="basic" matTooltip="Ingresar" (click)="ingresarEmpresa()"
+        [disabled]="empresaSelected == null">
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+      <!-- Deshabilitar si empresaSelected es null -->
+      <button mat-icon-button color="basic" matTooltip="Editar" (click)="openDialogEditar()"
+        [disabled]="empresaSelected == null">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="openDialogDelete()"
+        [disabled]="empresaSelected == null">
+        <mat-icon>delete</mat-icon>
+      </button>
+      <!-- Reporte empresa boton-->
+      <button mat-icon-button color="basic" matTooltip="Reporte" (click)="openReportes()">
+        <mat-icon>description</mat-icon>
+      </button>
+    </div>
+  </div>
 </div>

@@ -1,23 +1,23 @@
 package com.carla.erp_senseve.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @Entity
-@Data //Getters y setters
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="usuarios")
-@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class UsuarioModel implements UserDetails, CredentialsContainer {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,46 @@ public class UsuarioModel implements UserDetails, CredentialsContainer {
   @JsonIgnore
   private String password;
   private String tipo;
-  //Imp for UserDetails
+
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @JsonManagedReference(value = "usuario-cuenta")
+  private List<CuentaModel> cuentas;
+
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @JsonManagedReference(value = "usuario-empresa")
+  private List<EmpresaModel> empresas;
+
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @JsonManagedReference(value = "usuario-gestion")
+  private List<GestionModel> gestiones;
+
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonIgnore
+  @JsonManagedReference(value = "usuario-periodo")
+  private List<PeriodoModel> periodos;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonManagedReference(value = "usuario-moneda")
+  private List<MonedaModel> monedas;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonManagedReference(value = "usuario-empresa-moneda")
+  private List<EmpresaMonedaModel> empresas_monedas;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonManagedReference(value = "usuario-detalle_comprobante")
+  private List<DetalleComprobanteModel> detalles_comprobantes;
+
+  @JsonIgnore
+  @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+  @JsonManagedReference(value = "usuario-comprobante")
+  private List<ComprobanteModel> comprobantes;
 
 
   @Override

@@ -1,0 +1,59 @@
+<div class="bg-white p-4 text-black">
+  <!-- Crear empresa, inputs de:
+  nombre, niveles, nit, sigla, telefono,correo y dirección
+  -->
+  <h1 class="text-center">{{titulo}}</h1>
+  <form [formGroup]="empresaForm" class="grid grid-cols-2 w-full  gap-2 ">
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Nombre</mat-label>
+      <input type="text" formControlName="nombre" placeholder="Nombre" aria-label="Nombre" matInput
+        [value]="empresa?.nombre ?? ''">
+    </mat-form-field>
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Niveles</mat-label>
+      <mat-select formControlName="niveles">
+        <mat-select-trigger>
+          {{empresaForm.get('niveles')?.value}}
+        </mat-select-trigger>
+        <mat-option *ngFor="let nivel of niveles" [value]="nivel">{{nivel}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>NIT</mat-label>
+      <input type="text" formControlName="nit" placeholder="NIT" aria-label="NIT" matInput [value]="empresa?.nit ?? ''">
+    </mat-form-field>
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Sigla</mat-label>
+      <input type="text" formControlName="sigla" placeholder="Sigla" aria-label="Sigla" matInput
+        [value]="empresa?.sigla ?? ''">
+    </mat-form-field>
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Teléfono</mat-label>
+      <input type="text" formControlName="telefono" placeholder="Teléfono" aria-label="Teléfono" matInput
+        [value]="empresa?.telefono ?? ''">
+    </mat-form-field>
+    <mat-form-field class="w-full" appearance="fill">
+      <mat-label>Correo</mat-label>
+      <input type="email" formControlName="correo" placeholder="Correo" aria-label="Correo" matInput
+        [value]="empresa?.correo ?? ''">
+    </mat-form-field>
+    <mat-form-field class="w-full col-span-2" appearance="fill">
+      <mat-label>Moneda Principal</mat-label>
+      <mat-select formControlName="moneda">
+        <mat-select-trigger>
+          {{empresaForm.get('moneda')?.value?.nombre ?? 'Seleccione una moneda'}}
+        </mat-select-trigger>
+        <mat-option *ngFor="let moneda of monedas" [value]="moneda">{{moneda.nombre}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="w-full col-span-2" appearance="fill">
+      <mat-label>Dirección</mat-label>
+      <input type="text" formControlName="direccion" placeholder="Dirección" aria-label="Dirección" matInput
+        [value]="empresa?.direccion ?? ''">
+    </mat-form-field>
+    <!-- Boton de guardar -->
+    <div class="flex justify-center col-span-2">
+      <button mat-raised-button color="primary" class="w-full" (click)="crearEmpresa()">Guardar</button>
+    </div>
+  </form>
+</div>

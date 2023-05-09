@@ -6,14 +6,15 @@ import com.carla.erp_senseve.services.EmpresaService;
 import com.carla.erp_senseve.services.GestionService;
 import com.carla.erp_senseve.services.TokenGetUserService;
 import com.carla.erp_senseve.validate.GestionValidate;
-import jakarta.annotation.Nullable;
+import com.carla.erp_senseve.validate.ResponseMessage;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
+import java.time.format.DateTimeParseException;
 import java.util.Optional;
 
 @RestController
@@ -25,117 +26,94 @@ public class GestionController {
     TokenGetUserService tokenGetUserService;
     @Autowired
     GestionService gestionService;
-    @CrossOrigin
+
     @PostMapping("por_empresa")
-    public ResponseEntity<?> por_empresa(
-           @RequestHeader("Authorization") String authHeader,
-           @RequestBody EmpresaModel empresa
-    ){
-        if(empresa.getId() == null){
-            return ResponseEntity.badRequest().body("No se ha enviado el id de la empresa");
+    public ResponseEntity<?> por_empresa(@RequestHeader("Authorization") String authHeader, @RequestBody EmpresaModel empresa) {
+        if (empresa.getId() == null) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha enviado el id de la empresa"));
         }
-        EmpresaModel e = empresaService.una_empresa(empresa.getId(), tokenGetUserService.username(authHeader));
-        if(e == null){
-            return ResponseEntity.badRequest().body("No se ha encontrado la empresa");
+        Optional<EmpresaModel> e = empresaService.una_empresa(empresa.getId(), tokenGetUserService.username(authHeader));
+        if (e.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha encontrado la empresa"));
         }
-        //Add gestiones to Empresa
-
-        e.getGestiones(); // Esto es para que se carguen las gestiones de la empresa
-        return ResponseEntity.ok().body(e);
+        e.get();
+        return ResponseEntity.ok().body(e.get());
     }
-    @CrossOrigin
+
+
     @PostMapping("upsert")
-    public ResponseEntity<?> upsert(
-            @RequestHeader("Authorization") String authHeader,
-            @Valid @RequestBody GestionValidate gestion, BindingResult bindingResult
-            ) {
-        if(bindingResult.hasErrors()){
-            return ResponseEntity.badRequest().body(bindingResult.getAllErrors());
-        }
-        //If it invalid
-        if(gestion.getFecha_fin().before(gestion.getFecha_inicio())){
-            return ResponseEntity.badRequest().body("La fecha de fin no puede ser menor a la fecha de inicio");
-        }
-        if(gestion.getId() == null){
-            //check range
-            if(gestionService.isOverLapping(gestion)){
-                return ResponseEntity.badRequest().body("La fecha de inicio o fin se superpone con otra gestión");
-            }
-        }else{
-            if(gestionService.isOverLappingAndIsNot(gestion)){
-                return ResponseEntity.badRequest().body("La fecha de inicio o fin se superpone con otra gestión");
-            }
+    public ResponseEntity<?> upsert(@RequestHeader("Authorization") String authHeader, @Valid @RequestBody GestionValidate gestion, BindingResult bindingResult) throws HttpMessageNotReadableException {
+        //if throws HttpMessageNotReadableException, it means that the request body is empty
+        try {
+            GestionModel g = gestionService.upsert(gestion, tokenGetUserService.username(authHeader));
+            return ResponseEntity.ok().body(g);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new ResponseMessage(e.getMessage().toString()));
         }
 
-        GestionModel g =gestionService.upsert(gestion, tokenGetUserService.username(authHeader));
-        if(g == null){
-            return ResponseEntity.badRequest().body("No se ha podido guardar la gestión");
-        }
-        return ResponseEntity.ok().body(g);
     }
-    @CrossOrigin
+
     @PostMapping("cerrar")
-    public ResponseEntity<?> cerrar(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestBody GestionModel gestion
-    ){
-        if(gestion.getId() == null){
-            return ResponseEntity.badRequest().body("No se ha enviado el id de la gestión");
+    public ResponseEntity<?> cerrar(@RequestHeader("Authorization") String authHeader, @RequestBody GestionModel gestion) {
+        if (gestion.getId() == null) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha enviado el id de la gestión"));
         }
-        GestionModel g = gestionService.una_gestion(gestion.getId(), tokenGetUserService.username(authHeader));
-        if(g == null){
-            return ResponseEntity.badRequest().body("No se ha encontrado la gestión");
+        Optional<GestionModel> g = gestionService.una_gestion(gestion.getId(), tokenGetUserService.username(authHeader));
+        if (g.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha encontrado la gestión"));
         }
-        if(g.getEstado().equals(false)){
-            return ResponseEntity.badRequest().body("La gestión ya está cerrada");
+        if (g.get().getEstado().equals(false)) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("La gestión ya está cerrada"));
         }
-        GestionModel g2 = gestionService.cerrar(g.getId(), tokenGetUserService.username(authHeader));
-        if(g2 == null){
-            return ResponseEntity.badRequest().body("No se ha podido cerrar la gestión");
+        Optional<GestionModel> g2 = gestionService.cerrar(g.get().getId(), tokenGetUserService.username(authHeader));
+        if (g2.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha podido cerrar la gestión"));
         }
-        return ResponseEntity.ok().body("Gestión cerrada");
+        return ResponseEntity.ok().body(new ResponseMessage("Gestión cerrada"));
     }
-    @CrossOrigin
+
     @PostMapping("eliminar")
-    public ResponseEntity<?> eliminar(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestBody GestionModel gestion
-    ){
-        if(gestion.getId() == null){
+    public ResponseEntity<?> eliminar(@RequestHeader("Authorization") String authHeader, @RequestBody GestionModel gestion) {
+        if (gestion.getId() == null) {
             return ResponseEntity.badRequest().body("No se ha enviado el id de la gestión");
         }
-        GestionModel g = gestionService.una_gestion(gestion.getId(), tokenGetUserService.username(authHeader));
-
-        if(g == null){
-            return ResponseEntity.badRequest().body("No se ha encontrado la gestión");
+        Optional<GestionModel> g = gestionService.una_gestion(gestion.getId(), tokenGetUserService.username(authHeader));
+        if (g.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha encontrado la gestión"));
         }
-        if(g.getEstado() == false){
-            return ResponseEntity.badRequest().body("La gestión cerrada no se puede eliminar");
+        if (g.get().getEstado() == false) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("La gestión cerrada no se puede eliminar"));
         }
-        boolean g2 = gestionService.eliminar(g.getId(), tokenGetUserService.username(authHeader));
-        if(!g2){
-            return ResponseEntity.badRequest().body("No se ha podido eliminar la gestión");
+        boolean g2 = gestionService.eliminar(g.get().getId(), tokenGetUserService.username(authHeader));
+        if (!g2) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha podido eliminar la gestión"));
         }
-        return ResponseEntity.ok().body("Gestión eliminada");
+        return ResponseEntity.ok().body(new ResponseMessage("Gestión eliminada"));
     }
-    @CrossOrigin
+
     @PostMapping("con_periodos")
-    public ResponseEntity<?> con_periodos(
-            @RequestHeader("Authorization") String authHeader,
-            @RequestBody GestionModel gestion
-    ){
-        if(gestion.getId() == null){
-            return ResponseEntity.badRequest().body("No se ha enviado el id de la gestión");
+    public ResponseEntity<?> con_periodos(@RequestHeader("Authorization") String authHeader, @RequestBody GestionModel gestion) {
+        if (gestion.getId() == null) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha enviado el id de la gestión"));
         }
-        GestionModel g = gestionService.una_gestion(gestion.getId(), tokenGetUserService.username(authHeader));
+        Optional<GestionModel> g = gestionService.una_gestion(gestion.getId(), tokenGetUserService.username(authHeader));
+        if (g.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha encontrado la gestión"));
+        }
+        //g.get().getPeriodos();
 
-        if(g == null){
-            return ResponseEntity.badRequest().body("No se ha encontrado la gestión");
-        }
-        g.getPeriodos();
-        System.out.println(g.getPeriodos().size());
-        System.out.println(g.getId());
-        return ResponseEntity.ok(g);
+        //System.out.println(g.get().getPeriodos());
+        //System.out.println(g.get().getId());
+        return ResponseEntity.ok(g.get());
     }
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof DateTimeParseException) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("Valor invalido: " + cause.getMessage()));
+        }
+        return ResponseEntity.badRequest().body(new ResponseMessage("Entrada invalida: " + ex.getMessage()));
+    }
+
 
 }

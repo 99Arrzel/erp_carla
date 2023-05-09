@@ -1,0 +1,28 @@
+<div class="bg-white p-4">
+  <!-- Input de nombre, fecha inicio y fecha fin -->
+  <form [formGroup]="periodoForm" class="flex flex-col gap-4">
+    <h1 class="text-center text-black">Periodo</h1>
+    <div>
+      <label class="text-black">Nombre</label>
+      <input
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
+        type="text" placeholder="Nombre" formControlName="nombre">
+    </div>
+    <div>
+      <label class="text-black">Fecha inicio</label>
+      <input
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
+        type="date" placeholder="Fecha inicio" formControlName="fecha_inicio">
+    </div>
+    <div>
+      <label class="text-black">Fecha fin</label>
+      <input
+        class="shadow appearance-none border rounded w-full py-2 px-3 text-white leading-tight focus:outline-none focus:shadow-outline"
+        type="date" placeholder="Fecha fin" formControlName="fecha_fin">
+    </div>
+    <!-- Boton de crear -->
+    <div class="flex justify-center col-span-2">
+      <button mat-raised-button color="primary" class="w-full" (click)="crearPeriodo()">{{titulo}}</button>
+    </div>
+  </form>
+</div>

@@ -1,66 +1,88 @@
 package com.carla.erp_senseve.controllers;
 
-import com.carla.erp_senseve.config.JwtService;
 import com.carla.erp_senseve.models.EmpresaModel;
 import com.carla.erp_senseve.services.EmpresaService;
 import com.carla.erp_senseve.services.TokenGetUserService;
-import io.jsonwebtoken.Claims;
+import com.carla.erp_senseve.validate.ResponseMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/empresa")
 public class EmpresaController {
-
     @Autowired
     EmpresaService empresaService;
     @Autowired
     TokenGetUserService tokenGetUserService;
-    @CrossOrigin
     @GetMapping("/mis_empresas")
     public ResponseEntity<List<EmpresaModel>> empresas(
             @RequestHeader("Authorization") String authHeader
     ) {
-        return ResponseEntity.ok().body(empresaService.empresasUsuario(tokenGetUserService.username(authHeader)));
+        List<EmpresaModel> empresas = empresaService.empresasUsuario(tokenGetUserService.username(authHeader));
+
+        return ResponseEntity.ok().body(empresas);
     }
-    @CrossOrigin
     @PostMapping("/upsert")
     public ResponseEntity<?> upsert(
             @RequestHeader("Authorization") String authHeader,
-            @RequestBody EmpresaModel empresa
+            @RequestBody  Map<String,String> body
     ) {
-        Optional<EmpresaModel> e = empresaService.existeEmpresaNitOSigla(empresa.getNit(), empresa.getSigla());
-        if (e.isPresent() && empresa.getId() == null) {
-            return ResponseEntity.badRequest().body("Esa empresa ya existe con el mismo NIT o Sigla");
+        //Cast string to long
+        try {
+            EmpresaModel empresa = new EmpresaModel();
+            if(body.get("id") != null){
+                empresa.setId(Long.parseLong(body.get("id")));
+            }
+            empresa.setNombre(body.get("nombre"));
+            empresa.setNiveles(Integer.parseInt(body.get("niveles")));
+            empresa.setSigla(body.get("sigla"));
+            empresa.setCorreo(body.get("correo"));
+            empresa.setDireccion(body.get("direccion"));
+            empresa.setTelefono(body.get("telefono"));
+            empresa.setNit(body.get("nit"));
+            //
+            if(body.get("moneda_id") == null){
+                throw new Exception("No se ha enviado el id de la moneda");
+            }
+            return ResponseEntity.ok().body(empresaService.upsert(empresa, tokenGetUserService.username(authHeader), Long.parseLong(body.get("moneda_id"))));
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.badRequest().body(new ResponseMessage(e.getMessage().toString()));
+
         }
-            // Si el id de la empresa que se quiere guardar es igual al id de la empresa que se obtuvo de la base de datos, se edita
-            return ResponseEntity.ok().body(empresaService.upsert(empresa, tokenGetUserService.username(authHeader)));
     }
-    @CrossOrigin
     @PostMapping("/delete")
     public ResponseEntity<?> delete(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody EmpresaModel empresa
-
     ) {
-        if(empresa.getId() == null){
-            return ResponseEntity.badRequest().body("No se ha enviado el id de la empresa");
+        if (empresa.getId() == null) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha enviado el id de la empresa"));
         }
-        return ResponseEntity.ok().body(empresaService.delete(empresa.getId(), tokenGetUserService.username(authHeader)));
+        Optional<EmpresaModel> e = empresaService.delete(empresa.getId(), tokenGetUserService.username(authHeader));
+        if (e.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha encontrado la empresa"));
+        }
+        return ResponseEntity.ok().body(e.get());
     }
-    @CrossOrigin
     @PostMapping("/una_empresa")
     public ResponseEntity<?> una_empresa(
             @RequestHeader("Authorization") String authHeader,
             @RequestBody EmpresaModel empresa
     ) {
-        if(empresa.getId() == null){
-            return ResponseEntity.badRequest().body("No se ha enviado el id de la empresa");
+        if (empresa.getId() == null) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha enviado el id de la empresa"));
         }
-        return ResponseEntity.ok().body(empresaService.una_empresa(empresa.getId(), tokenGetUserService.username(authHeader)));
+        Optional<EmpresaModel> ep = empresaService.una_empresa(empresa.getId(), tokenGetUserService.username(authHeader));
+
+        if (ep.isEmpty()) {
+            return ResponseEntity.badRequest().body(new ResponseMessage("No se ha encontrado la empresa"));
+        }
+        return ResponseEntity.ok().body(ep.get());
     }
 }

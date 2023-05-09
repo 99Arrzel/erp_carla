@@ -1,39 +1,56 @@
 package com.carla.erp_senseve.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
-@Data //Getters y setters
+//@Getter
+//@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="empresas")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class EmpresaModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String nombre;
+    @NotNull
     private String nit;
+    @NotNull
     private String sigla;
     private String telefono;
     private String correo;
     private String direccion;
+    @NotNull
     private Integer niveles;
-    private Boolean estado;
+    @NotNull
+    private Boolean estado = true;
+    @NotNull
     @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
+    @JsonBackReference(value = "usuario-empresa")
     private UsuarioModel usuario;
-    //Fetch gestiones
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "empresa_id")
-    @JsonManagedReference //Avoid infinite recursion
+
+    @JsonManagedReference(value = "empresa-gestion")
+    @OneToMany(mappedBy = "empresa")
     private List<GestionModel> gestiones;
 
+    @OneToMany(mappedBy = "empresa")
+    @JsonManagedReference(value = "empresa-cuenta")
+    private List<CuentaModel> cuentas;
+    @OneToMany(mappedBy = "empresa")
+    @JsonManagedReference(value = "moneda-empresa")
+    private List<EmpresaMonedaModel> monedas;
+
+    @OneToMany(mappedBy = "empresa")
+    @JsonManagedReference(value = "empresa-comprobante")
+    private List<ComprobanteModel> comprobantes;
 
 }

@@ -3,21 +3,22 @@
     <div class="bg-white rounded-lg p-4">
       <form class="flex flex-col  gap-2 p-4" [formGroup]="loginForm">
         <div class="text-2xl text-center font-bold text-gray-700">Login</div>
-        <!-- {{ loginForm.value | json }} -->
-        <!-- input and password -->
+
         <mat-form-field appearance="fill">
           <mat-label>Usuario</mat-label>
           <input matInput type="text" formControlName="usuario" />
-          <mat-hint>{{error.usuario}}</mat-hint>
+          <mat-hint class="text-red-500">{{error.usuario}}</mat-hint>
         </mat-form-field>
         <mat-form-field appearance="fill">
           <mat-label>Password</mat-label>
           <input matInput type="text" formControlName="password" type="password" />
-          <mat-hint>{{error.password}}</mat-hint>
+          <mat-hint class="text-red-500">{{error.password}}</mat-hint>
         </mat-form-field>
         <button (click)="login()" mat-raised-button color="primary">
           Login
         </button>
+
+        <a class="text-red-500">{{ errorResponse }}</a>
       </form>
     </div>
   </div>

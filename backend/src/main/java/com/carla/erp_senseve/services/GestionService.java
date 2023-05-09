@@ -1,105 +1,113 @@
 package com.carla.erp_senseve.services;
-
-import com.carla.erp_senseve.models.EmpresaModel;
 import com.carla.erp_senseve.models.GestionModel;
+import com.carla.erp_senseve.models.UsuarioModel;
 import com.carla.erp_senseve.repositories.GestionRepository;
+import com.carla.erp_senseve.repositories.UsuarioRepository;
 import com.carla.erp_senseve.validate.GestionValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
-
+import java.util.Optional;
 @Service
 public class GestionService {
-    @Autowired
-    GestionRepository gestionRepository;
-    @Autowired
-    EmpresaService empresaService;
+  @Autowired
+  GestionRepository gestionRepository;
+  @Autowired
+  EmpresaService empresaService;
+  @Autowired
+  UsuarioRepository usuarioRepository;
+  public Optional<GestionModel> cerrar(Long id, String username) {
+    GestionModel g = gestionRepository.findById(id).get();
+    if (g != null) {
+      g.setEstado(false);
+      return Optional.of(gestionRepository.save(g));
+    }
+    return Optional.empty();
+  }
+  public Optional<GestionModel> una_gestion(Long id, String username) {
+    return gestionRepository.findById(id);
+  }
+  public GestionModel obtenerGestion(Long id){
+    return gestionRepository.findById(id).orElseThrow(
+      () -> new RuntimeException("No existe gestion")
+  );
+  }
+  public GestionModel upsert(GestionValidate gestion, String username) {
+    UsuarioModel e = usuarioRepository.findByUsuario(username).orElseThrow(
+        () -> new RuntimeException("No existe usuario")
+    );
+    List<GestionModel> abiertas = gestionRepository.findByEmpresaIdAndEstado(gestion.getEmpresa_id(), true);
 
-    public GestionModel saveGestion(GestionModel gestion) {
-        return gestionRepository.save(gestion);
+    if(abiertas.size() > 1 && gestion.getId() == null ){
+      throw new RuntimeException("No pueden existir más de 2 gestiones abiertas");
     }
+    if(gestion.getNombre() == null){
+      throw new RuntimeException("El nombre es obligatorio");
+    }
+    if(gestion.getFecha_inicio() == null){
+      throw new RuntimeException("La fecha de inicio es obligatoria");
+    }
+    if(gestion.getFecha_fin() == null){
+      throw new RuntimeException("La fecha de fin es obligatoria");
+    }
+    if(gestion.getId() != null){
+      GestionModel ges = gestionRepository.findById(gestion.getId()).orElseThrow(
+          () -> new RuntimeException("No existe gestion")
+      );
+      if(ges.getEstado() == false){
+        throw new RuntimeException("No se puede editar una gestion cerrada");
+      }
+      GestionModel checkNombre = gestionRepository.findByNombreAndEmpresaId(gestion.getNombre(), gestion.getEmpresa_id(), gestion.getId()).orElse(null);
+      if(checkNombre != null){
+        throw new RuntimeException("Ya existe una gestion con el mismo nombre");
+      }
+      List<GestionModel> checkOverlap = gestionRepository.isOverlappingAndIsNot(gestion.getId(), gestion.getEmpresa_id(), gestion.getFecha_inicio(), gestion.getFecha_fin());
+      if(checkOverlap.size() > 0){
+        throw new RuntimeException("La fecha de inicio o fin de la gestión se solapa con otra gestión");
+      }
+      ges.setNombre(gestion.getNombre());
+      ges.setFechaInicio(gestion.getFecha_inicio());
+      ges.setFechaFin(gestion.getFecha_fin());
+      ges.setEmpresa(empresaService.una_empresa(gestion.getEmpresa_id(), username).get());
+      ges.setUsuario(e);
+      ges.setEstado(true);
+      return gestionRepository.save(ges);
+    }
+    GestionModel checkNombre = gestionRepository.findByNombreAndEmpresaId(gestion.getNombre(), gestion.getEmpresa_id()).orElse(null);
+    if(checkNombre != null){
+      throw new RuntimeException("Ya existe una gestion con el mismo nombre");
+    }
+    List<GestionModel> checkOverlap = gestionRepository.isOverlapping(gestion.getEmpresa_id(), gestion.getFecha_inicio(), gestion.getFecha_fin());
+    if(checkOverlap.size() > 0){
+      throw new RuntimeException("La fecha de inicio o fin de la gestión se solapa con otra gestión");
+    }
+    GestionModel g = new GestionModel();
+    g.setNombre(gestion.getNombre());
+    g.setFechaInicio(gestion.getFecha_inicio());
+    g.setFechaFin(gestion.getFecha_fin());
+    g.setEmpresa(empresaService.una_empresa(gestion.getEmpresa_id(), username).get());
+    g.setUsuario(e);
+    g.setEstado(true);
+    return gestionRepository.save(g);
+  }
+  public boolean eliminar(Long id, String username) {
+    Optional<GestionModel> g = gestionRepository.findById(id);
+    if (g.isEmpty()) {
+      return false;
+    }
+    if(g.get().getEstado() == false){
+      throw new RuntimeException("No se puede eliminar una gestion cerrada");
+    }
+    gestionRepository.delete(g.get());
+    return true;
+    //}
 
-    public GestionModel updateGestion(GestionModel gestion) {
-        //Fetch id
-        GestionModel g = gestionRepository.findById(gestion.getId()).get();
-        g.setFechaFin(gestion.getFechaFin());
-        g.setFechaInicio(gestion.getFechaInicio());
-        g.setNombre(gestion.getNombre());
-        return gestionRepository.save(g);
-    }
-    public GestionModel cerrar(Long id, String username) {
-        GestionModel g = gestionRepository.findById(id).get();
-        if (g != null) {
-            g.setEstado(false);
-            return gestionRepository.save(g);
-        }
-        return null;
-    }
-    public List<GestionModel> getGestiones(Long empresaId) {
-        return gestionRepository.findByEmpresaId(empresaId);
-    }
+  }
 
-    public List<GestionModel> getBetweenDates(Date fecha_inicio, Date fecha_fin, Long empresaId) {
-        return gestionRepository.findByFechaInicioBetweenAndFechaFinBetweenAndEmpresaId(fecha_inicio, fecha_fin, fecha_inicio, fecha_fin, empresaId);
-    }
-    public GestionModel una_gestion(Long id, String username) {
-
-        return gestionRepository.findById(id).get();
-    }
-
-    public GestionModel upsert(GestionValidate gestion, String username) {
-        //Search empresa
-        EmpresaModel empresa = empresaService.una_empresa(gestion.getEmpresa_id(), username);
-        if (empresa == null) {
-            return null;
-        }
-        GestionModel g = new GestionModel();
-
-        if (gestion.getId() == null) { //Entonces se crea
-            GestionModel ge = new GestionModel();
-            ge.setFechaFin(gestion.getFecha_fin());
-            ge.setFechaInicio(gestion.getFecha_inicio());
-            ge.setNombre(gestion.getNombre());
-            ge.setEmpresa(empresa);
-            ge.setUsuario(empresa.getUsuario());
-            ge.setEstado(true);
-            return gestionRepository.save(ge);
-        }
-        g.setFechaFin(gestion.getFecha_fin());
-        g.setFechaInicio(gestion.getFecha_inicio());
-        g.setNombre(gestion.getNombre());
-        g.setEstado(true);
-        return gestionRepository.save(g);
-    }
-    public Boolean isOverLappingAndIsNot(GestionValidate gestion) {
-        List<GestionModel> gestiones = gestionRepository.findByIdNotAndEmpresaIdAndFechaInicioBetweenOrFechaFinBetween(
-                gestion.getId(),
-                gestion.getEmpresa_id(),
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin(),
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin());
-        return gestiones.size() > 0; //Si hay mas de 0 gestiones, entonces hay una que se solapa
-    }
-
-    public Boolean isOverLapping(GestionValidate gestion) {
-        List<GestionModel> gestiones = gestionRepository.findByFechaInicioBetweenAndFechaFinBetweenAndEmpresaId(
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin(),
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin(),
-                gestion.getEmpresa_id());
-        return gestiones.size() > 0; //Si hay mas de 0 gestiones, entonces hay una que se solapa
-    }
-
-    public boolean eliminar(Long id, String username) {
-        GestionModel g = gestionRepository.findById(id).get();
-        if (g.getEmpresa().getUsuario().getUsername().equals(username)) {
-            gestionRepository.delete(g);
-            return true;
-        }
-        return false;
-    }
+  public GestionModel gestionEnFechaConIdEmpresa(Date fecha, Long empresaId) {
+    GestionModel ges = gestionRepository.gestionEnFechaConIdEmpresa(fecha, empresaId);
+    return ges;
+  }
 }

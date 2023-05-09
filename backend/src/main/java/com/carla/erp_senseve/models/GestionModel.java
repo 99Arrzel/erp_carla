@@ -1,45 +1,44 @@
 package com.carla.erp_senseve.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.sql.Date;
 import java.util.List;
 
 @Entity
-@Data //Getters y setters
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="gestiones")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class GestionModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String nombre;
+    @NotNull
     @Column(name = "fecha_inicio")
     private Date fechaInicio;
+    @NotNull
     @Column(name = "fecha_fin")
     private Date fechaFin;
-    private Boolean estado;
-
-    @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @NotNull
+    private Boolean estado = true;
+    @NotNull
+    @ManyToOne(fetch =  FetchType.EAGER)
+    @JsonBackReference (value = "usuario-gestion")
     private UsuarioModel usuario;
-    @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "empresa_id")
-    @JsonBackReference //Avoid infinite recursion
+    @NotNull
+    @ManyToOne(fetch =  FetchType.EAGER)
+    @JsonBackReference(value = "empresa-gestion")
     private EmpresaModel empresa;
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gestion_id")
-    @JsonManagedReference
+    @OneToMany(mappedBy = "gestion")
+    @JsonManagedReference (value = "gestion-periodo")
     private List<PeriodoModel> periodos;
-
 
 }

@@ -1,97 +1,127 @@
 package com.carla.erp_senseve.services;
 
-
-import com.carla.erp_senseve.models.EmpresaModel;
 import com.carla.erp_senseve.models.GestionModel;
 import com.carla.erp_senseve.models.PeriodoModel;
+import com.carla.erp_senseve.models.UsuarioModel;
 import com.carla.erp_senseve.repositories.PeriodoRepository;
-import com.carla.erp_senseve.validate.GestionValidate;
+import com.carla.erp_senseve.repositories.UsuarioRepository;
 import com.carla.erp_senseve.validate.PeriodoValidate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.Period;
+import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PeriodoService {
-    @Autowired
-    private PeriodoRepository periodoRepository;
-    @Autowired
-    private GestionService gestionService;
+  @Autowired
+  private PeriodoRepository periodoRepository;
+  @Autowired
+  private GestionService gestionService;
+  @Autowired
+  private UsuarioRepository usuarioRepository;
 
-    public PeriodoModel savePeriodo(PeriodoModel periodo) {
-        return periodoRepository.save(periodo);
+
+
+  public PeriodoModel upsert(PeriodoValidate periodo, String username) {
+    //Search empresa
+    GestionModel gestion = gestionService.una_gestion(periodo.getGestion_id(), username).orElseThrow(
+        () -> new RuntimeException("No existe esa gestion")
+    );
+    if (!gestion.getEstado()) {
+      throw new RuntimeException("No se puede editar periodos de una gestion cerrada");
     }
 
-    public PeriodoModel upsert(PeriodoValidate periodo, String username) {
-        //Search empresa
-        GestionModel gestion = gestionService.una_gestion(periodo.getGestion_id(), username);
-        if (gestion == null) {
-            return null;
-        }
-        PeriodoModel g = new PeriodoModel();
-
-        if (periodo.getId() == null) { //Entonces se crea
-            PeriodoModel pe = new PeriodoModel();
-            pe.setFechaFin(periodo.getFecha_fin());
-            pe.setFechaInicio(periodo.getFecha_inicio());
-            pe.setNombre(periodo.getNombre());
-            pe.setGestion(gestion);
-            pe.setUsuario(gestion.getUsuario());
-            pe.setEstado(true);
-            return periodoRepository.save(pe);
-        }
-        g.setFechaFin(periodo.getFecha_fin());
-        g.setFechaInicio(periodo.getFecha_inicio());
-        g.setNombre(periodo.getNombre());
-        g.setEstado(true);
-        return periodoRepository.save(g);
+    if (periodo.getFecha_inicio().after(periodo.getFecha_fin())) {
+      throw new RuntimeException("La fecha de inicio no puede ser mayor a la fecha de fin");
+    }
+    if (periodo.getFecha_inicio().before(gestion.getFechaInicio()) || periodo.getFecha_fin().after(gestion.getFechaFin())) {
+      throw new RuntimeException("El periodo no puede estar fuera de la gestion " +
+          "Inicio: " + gestion.getFechaInicio() + " Fin: " + gestion.getFechaFin());
+    }
+    if (periodo.getId() != null) {
+      List<PeriodoModel> periodosNombre = periodoRepository.findByGestionIdAndNombreAndIdNot(periodo.getGestion_id(), periodo.getNombre(), periodo.getId());
+      if (periodosNombre.size() > 0) {
+        throw new RuntimeException("Ya existe un periodo con ese nombre");
+      }
+      PeriodoModel p = periodoRepository.findById(periodo.getId()).orElseThrow(
+          () -> new RuntimeException("No existe ese periodo")
+      );
+      if (!p.getUsuario().getUsuario().equals(username)) {
+        throw new RuntimeException("No tienes permiso para editar este periodo");
+      }
+      List<PeriodoModel> periodos = periodoRepository.isOverlappingAndIsNot(periodo.getId(), periodo.getGestion_id(), periodo.getFecha_inicio(), periodo.getFecha_fin());
+      if (periodos.size() > 0) {
+        throw new RuntimeException("El periodo se solapa con otro periodo");
+      }
+      p = periodoRepository.findById(periodo.getId()).get();
+      p.setFechaInicio(periodo.getFecha_inicio());
+      p.setFechaFin(periodo.getFecha_fin());
+      p.setNombre(periodo.getNombre());
+      return periodoRepository.save(p);
+    }
+    List<PeriodoModel> periodosNombre = periodoRepository.findByGestionIdAndNombre(periodo.getGestion_id(), periodo.getNombre());
+    if (periodosNombre.size() > 0) {
+      throw new RuntimeException("Ya existe un periodo con ese nombre");
     }
 
-
-
-    public Boolean isOverLappingAndIsNot(PeriodoValidate gestion) {
-        List<PeriodoModel> gestiones = periodoRepository.findByIdNotAndGestionIdAndFechaInicioBetweenOrFechaFinBetween(
-                gestion.getId(),
-                gestion.getGestion_id(),
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin(),
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin());
-        return gestiones.size() > 0; //Si hay mas de 0 gestiones, entonces hay una que se solapa
+    List<PeriodoModel> periodos = periodoRepository.isOverlapping(periodo.getGestion_id(), periodo.getFecha_inicio(), periodo.getFecha_fin());
+    if (periodos.size() > 0) {
+      throw new RuntimeException("El periodo se solapa con otro periodo");
     }
-    public Boolean isOverLapping(PeriodoValidate gestion) {
-        List<PeriodoModel> gestiones = periodoRepository.findByFechaInicioBetweenAndFechaFinBetweenAndGestionId(
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin(),
-                gestion.getFecha_inicio(),
-                gestion.getFecha_fin(),
-                gestion.getGestion_id());
-        return gestiones.size() > 0; //Si hay mas de 0 gestiones, entonces hay una que se solapa
+    PeriodoModel p = new PeriodoModel();
+    p.setFechaInicio(periodo.getFecha_inicio());
+    p.setFechaFin(periodo.getFecha_fin());
+    p.setNombre(periodo.getNombre());
+    p.setGestion(gestion);
+    p.setEstado(true);
+    p.setUsuario(gestion.getUsuario());
+    return periodoRepository.save(p);
+  }
+  public Boolean eliminar(Long id, String username) {
+    PeriodoModel g = periodoRepository.findById(id).orElseThrow(
+        () -> new RuntimeException("No existe ese periodo")
+    );
+    if(g.getGestion().getEstado() == false) throw new RuntimeException("No se puede eliminar un periodo de una gestion cerrada");
+    if(g.getEstado() == false) throw new RuntimeException("No se puede eliminar un periodo cerrado");
+    if (g.getGestion().getUsuario().getUsername().equals(username)) {
+      periodoRepository.delete(g);
+      return true;
     }
-    public boolean eliminar(Long id, String username) {
-        PeriodoModel g = periodoRepository.findById(id).get();
-        if (g.getGestion().getUsuario().getUsername().equals(username)) {
-            periodoRepository.delete(g);
-            return true;
-        }
+    throw new RuntimeException("No tienes permiso para eliminar este periodo");
+  }
+  public PeriodoModel cerrar(Long id, String username) {
+    PeriodoModel g = periodoRepository.findById(id).orElseThrow(
+        () -> new RuntimeException("No existe ese periodo")
+    );
+    if (g.getGestion().getUsuario().getUsername().equals(username)) {
+      g.setEstado(false);
+      return periodoRepository.save(g);
+    }
+    throw new RuntimeException("No tienes permiso para cerrar este periodo");
+  }
+  public Optional<PeriodoModel> un_periodo(Long id, String username) {
+    Optional<PeriodoModel> g = periodoRepository.findById(id);
+    Optional<UsuarioModel> u = usuarioRepository.findByUsuario(username);
+    if (g.isEmpty()) return Optional.empty();
+    if (g.get().getUsuario().getId() == u.get().getId()) {
+      return g;
+    }
+    return Optional.empty();
+  }
+
+    public boolean hayPeriodoAbiertoEnEmpresaYFecha(Long empresaId, Date fecha) {
+      PeriodoModel existe = periodoRepository.hayPeriodoAbiertoEnEmpresaYFecha(empresaId, fecha);
+        if(existe != null) return true;
         return false;
     }
-    public PeriodoModel cerrar(Long id, String username) {
-        PeriodoModel g = periodoRepository.findById(id).get();
-        if (g.getGestion().getUsuario().getUsername().equals(username)) {
-            g.setEstado(false);
-            return periodoRepository.save(g);
-        }
-        return null;
-    }
-    public PeriodoModel un_periodo (Long id, String username) {
-        PeriodoModel g = periodoRepository.findById(id).get();
-        if (g.getGestion().getUsuario().getUsername().equals(username)) {
-            return g;
-        }
-        return null;
-    }
 
+    public PeriodoModel obtenerPeriodo(Long id) {
+    var periodo = periodoRepository.findByElId(id);
+    if(periodo == null){
+      throw new RuntimeException("No existe el periodo");
+    }
+        return periodo;
+    }
 }

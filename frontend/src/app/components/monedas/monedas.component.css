@@ -1,0 +1,11 @@
+.alinear-derecha .p-inputnumber-input {
+  text-align: right;
+}
+.alinear-derecha {
+  display: flex;
+  justify-content: flex-end;
+}
+input.p-inputtext.p-inputnumber-input{
+  text-align: right;
+
+}

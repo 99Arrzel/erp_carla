@@ -1,18 +1,19 @@
 package com.carla.erp_senseve.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import org.hibernate.annotations.Proxy;
+import java.util.List;
 @Entity
-@Data //Getters y setters
+@Getter
+@Setter
 @Table(name="cuentas")
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+@Proxy(lazy = false)
 public class CuentaModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,23 +22,27 @@ public class CuentaModel{
     private String codigo;
     private Integer nivel;
     private String tipo;
-    @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "empresa_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JsonBackReference //Avoid infinite recursion
+    @NotNull
+    @ManyToOne(fetch =  FetchType.EAGER)
+    @JsonBackReference(value = "empresa-cuenta")
     private EmpresaModel empresa;
-
-    @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "padre_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JsonBackReference //Avoid infinite recursion
+    @ManyToOne(fetch =  FetchType.EAGER)
     private CuentaModel padre;
-    @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @JsonBackReference //Avoid infinite recursion
+    @NotNull
+    @ManyToOne(fetch =  FetchType.EAGER)
+    @JsonBackReference(value = "usuario-cuenta")
     private UsuarioModel usuario;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "cuenta")
+    @JsonManagedReference(value = "detalles-cuenta")
+    private List<DetalleComprobanteModel> detalle_comprobantes;
 
+    //No migrar
+    @Transient
+    private DetalleComprobanteModel unicodetalle;
 
-
+    @Transient
+    private Float total_balance_inicial;
+    public void setUnicoDetalle(DetalleComprobanteModel detalleComprobanteModel) {
+        this.unicodetalle = detalleComprobanteModel;
+    }
 }

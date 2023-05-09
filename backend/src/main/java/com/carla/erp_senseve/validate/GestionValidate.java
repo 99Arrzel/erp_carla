@@ -9,8 +9,6 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Date;
-import java.util.Optional;
-
 //Getters and setters lombok
 @Getter
 @Setter
@@ -28,5 +26,4 @@ public class GestionValidate {
     private Date fecha_fin;
     @NotNull(message = "La empresa es requerida")
     private long empresa_id;
-
 }

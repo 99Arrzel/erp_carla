@@ -1,0 +1,48 @@
+<div class="flex flex-wrap justify-items-center justify-center  gap-2 w-full bg-gray-600 ">
+  <button mat-icon-button color="primary" matTooltip="Crear" (click)="openDialogCrear()">
+    <mat-icon>add</mat-icon>
+  </button>
+  <button mat-icon-button color="basic" matTooltip="Editar" (click)="openDialogEditar()"
+    [disabled]="selectedPeriodo ? false : true">
+    <mat-icon>edit</mat-icon>
+  </button>
+  <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="openDialogDelete()"
+    [disabled]="selectedPeriodo?.estado != false && selectedPeriodo ? false : true ">
+    <mat-icon>delete</mat-icon>
+  </button>
+  <button mat-icon-button color="basic" matTooltip="Cerrar" (click)="openDialogCerrar()"
+    [disabled]="selectedPeriodo?.estado != false && selectedPeriodo ? false : true">
+    <mat-icon>close</mat-icon>
+  </button>
+  <!-- Button para ver periodos -->
+  <button mat-icon-button color="basic" matTooltip="Volver a gestiones" (click)="volverAGestiones()">
+    <mat-icon>date_range</mat-icon>
+  </button>
+  <button mat-icon-button color="basic" matTooltip="Reporte" (click)="openReportes()">
+    <mat-icon>description</mat-icon>
+  </button>
+</div>
+
+
+<p-table *ngIf="gestion" [value]="gestion.periodos" selectionMode="single" [(selection)]="selectedPeriodo"
+  emptyMessage="No hay periodos para esta gestion">
+  >
+  <ng-template pTemplate="header">
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Fecha de inicio</th>
+      <th>Fecha de fin</th>
+      <th>Estado</th>
+    </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-car>
+    <tr [pSelectableRow]="car">
+      <td>{{car.id}}</td>
+      <td>{{car.nombre}}</td>
+      <td>{{car.fechaInicio}}</td>
+      <td>{{car.fechaFin}}</td>
+      <td>{{car.estado ? 'Activo' : 'Inactivo'}}</td>
+    </tr>
+  </ng-template>
+</p-table>
