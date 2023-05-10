@@ -47,6 +47,7 @@ public class ComprobanteService {
         /*
         Validar que el comprobante este en el RANGO de un periodo abierto
         * */
+
         boolean continuar = periodoService.hayPeriodoAbiertoEnEmpresaYFecha(comprobante.getEmpresa_id(), comprobante.getFecha());
         if(!continuar){
             throw new RuntimeException("No hay periodo abierto en la fecha del comprobante");

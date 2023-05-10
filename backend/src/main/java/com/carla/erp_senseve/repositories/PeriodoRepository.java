@@ -40,11 +40,20 @@ public interface PeriodoRepository extends JpaRepository<PeriodoModel, Long> {
   );
 
 
-    @Query(value = "select * from \"periodos\" where \"gestion_id\" = :gestionId and \"fecha_inicio\" <= :fecha and \"fecha_fin\" >= :fecha limit 1", nativeQuery = true)
+    /*@Query(value = "select * from \"periodos\" where \"gestion_id\" = :gestionId and \"fecha_inicio\" <= :fecha and \"fecha_fin\" >= :fecha limit 1", nativeQuery = true)
     PeriodoModel hayPeriodoAbiertoEnEmpresaYFecha(
-        @Param("gestionId") Long gestionId,
+        @Param("empresa_id") Long empresa_id,
         @Param("fecha") Date fecha
     );
+    BAD
+    */
+    @Query(value = "select p.* from \"periodos\" p JOIN \"gestiones\" g ON p.\"gestion_id\" = g.id where g.\"empresa_id\" = :empresa_id and p.\"fecha_inicio\" <= :fecha and p.\"fecha_fin\" >= :fecha limit 1", nativeQuery = true)
+    PeriodoModel hayPeriodoAbiertoEnEmpresaYFecha(
+            @Param("empresa_id") Long empresa_id,
+            @Param("fecha") Date fecha
+    );
+
+
 
     //Select por id simple
     @Query(value = "select * from \"periodos\" where id = :id", nativeQuery = true)

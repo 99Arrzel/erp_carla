@@ -112,6 +112,8 @@ public class PeriodoService {
   }
 
     public boolean hayPeriodoAbiertoEnEmpresaYFecha(Long empresaId, Date fecha) {
+
+
       PeriodoModel existe = periodoRepository.hayPeriodoAbiertoEnEmpresaYFecha(empresaId, fecha);
         if(existe != null) return true;
         return false;
