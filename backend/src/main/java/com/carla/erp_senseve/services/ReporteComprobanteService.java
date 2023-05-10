@@ -286,4 +286,66 @@ public class ReporteComprobanteService {
         reporteComprobanteLibroMayorModel.setGestion(periodo.getGestion().getNombre());
         return reporteComprobanteLibroMayorModel;
     }
+
+    public ReporteSumasSaldosModel report_sumas_saldos(String idMoneda, String idGestion) {
+        GestionModel gestion = gestionService.obtenerGestion(Long.parseLong(idGestion));
+        MonedaModel moneda = monedaService.obtenerMoneda(Long.parseLong(idMoneda));
+        ReporteSumasSaldosModel reporteSumasSaldosModel = new ReporteSumasSaldosModel();
+        reporteSumasSaldosModel.setGestion(gestion.getNombre());
+        reporteSumasSaldosModel.setMoneda(moneda.getNombre());
+        reporteSumasSaldosModel.setEmpresa(gestion.getEmpresa().getNombre());
+        reporteSumasSaldosModel.setUsuario(gestion.getUsuario().getNombre());
+        //detalles
+        List<ComprobanteModel> comprobante = comprobanteService.obtenerComprobantesInicioFinEmpresa(gestion.getFechaInicio(), gestion.getFechaFin(), gestion.getEmpresa().getId());
+
+        List<Long> idsComprobantes = new ArrayList<>();
+        comprobante.forEach(comprobanteModel -> {
+            idsComprobantes.add(comprobanteModel.getId());
+        });
+        //Ahora las cuentas
+        List<CuentaModel> cuentas = cuentaService.obtenerCuentasPorEmpresa(gestion.getEmpresa().getId());
+        //De las cuentas, los detalles que este
+        cuentas.forEach(cuentaModel -> {
+            cuentaModel.getDetalle_comprobantes().removeIf(detalle -> {
+                return !idsComprobantes.contains(detalle.getComprobante_id());
+            });
+        });
+        //Ahora removemos las cuentas con detalles vacios
+        cuentas.removeIf(cuentaModel -> cuentaModel.getDetalle_comprobantes().isEmpty());
+        //Ahora ordenamos todo en el modelo  de reporteSumasSaldos
+//detalleComprobanteModel.getComprobante().getTc()
+        List<DetallesSumasSaldos> detallesSumasSaldosList = new ArrayList<>();
+        cuentas.forEach(cuentaModel -> {
+            DetallesSumasSaldos detallesSumasSaldos = new DetallesSumasSaldos();
+            detallesSumasSaldos.setCuenta(cuentaModel.getCodigo() + " - " + cuentaModel.getNombre());
+            //Hacer la suma de todos los debe y haber de los detalles
+            AtomicReference<Float> totalDebe = new AtomicReference<>(0f);
+            AtomicReference<Float> totalHaber = new AtomicReference<>(0f);
+            cuentaModel.getDetalle_comprobantes().forEach(detalleComprobanteModel -> {
+                //El total lo multiplicamos si el idMoneda es igual al id del comprobante
+                if (detalleComprobanteModel.getComprobante().getMoneda().getId() == Long.parseLong(idMoneda)) {
+                    totalDebe.updateAndGet(v -> (float) (v + detalleComprobanteModel.getMonto_debe() * detalleComprobanteModel.getComprobante().getTc()));
+                    totalHaber.updateAndGet(v -> (float) (v + detalleComprobanteModel.getMonto_haber() * detalleComprobanteModel.getComprobante().getTc()));
+                } else {
+                    totalDebe.updateAndGet(v -> (float) (v + detalleComprobanteModel.getMonto_debe()));
+                    totalHaber.updateAndGet(v -> (float) (v + detalleComprobanteModel.getMonto_haber()));
+                }
+            });
+            detallesSumasSaldos.setDebe_suma(totalDebe.get());
+            detallesSumasSaldos.setHaber_suma(totalHaber.get());
+            //ahora el debe_saldo es sumas_debe - sumas_haber
+            //también el haber_saldo es sumas_haber - sumas_debe
+            if(totalDebe.get() > totalHaber.get()){
+                detallesSumasSaldos.setDebe_saldo(Math.abs(totalDebe.get() - totalHaber.get()));
+                detallesSumasSaldos.setHaber_saldo(0f);
+            }else if(totalDebe.get() < totalHaber.get()){
+                detallesSumasSaldos.setDebe_saldo(0f);
+                detallesSumasSaldos.setHaber_saldo(Math.abs(totalHaber.get() - totalDebe.get()));
+            }
+
+            detallesSumasSaldosList.add(detallesSumasSaldos);
+        });
+        reporteSumasSaldosModel.setDetalles(detallesSumasSaldosList);
+        return reporteSumasSaldosModel;
+    }
 }

@@ -1,9 +1,6 @@
 package com.carla.erp_senseve.controllers;
 
-import com.carla.erp_senseve.models.ReporteBalanceInicialModel;
-import com.carla.erp_senseve.models.ReporteComprobanteLibroDiarioModel;
-import com.carla.erp_senseve.models.ReporteComprobanteLibroMayorModel;
-import com.carla.erp_senseve.models.ReporteComprobanteModel;
+import com.carla.erp_senseve.models.*;
 import com.carla.erp_senseve.services.ReporteComprobanteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -32,6 +29,22 @@ public class ReportesController {
             return ResponseEntity.badRequest().body(e.getMessage().toString());
         }
     }
+    @PostMapping(value="/reporte-sumas-saldos", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> reporte_sumas_saldos(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam Map<String, String> data
+    ){
+        try{
+            System.out.println(data.get("id_gestion"));
+            System.out.println(data.get("id_moneda"));
+            ReporteSumasSaldosModel reporte = reporteComprobanteService.report_sumas_saldos(data.get("id_moneda"), data.get("id_gestion"));
+            return ResponseEntity.ok().body(reporte);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
+
     @PostMapping(value = "/reporte-libro-diario", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> reporte_libro_diario(
             @RequestHeader("Authorization") String authHeader,
