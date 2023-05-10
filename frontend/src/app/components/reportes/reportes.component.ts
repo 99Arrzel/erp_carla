@@ -47,9 +47,9 @@ export class ReportesComponent {
       baseUrl = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteLibroDiario&standAlone=true";
     } else if (data == 'Libro Mayor') {
       baseUrl = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteLibroMayor&standAlone=true";
-
+    } else if (data == 'Sumas y Saldos') {
+      baseUrl = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteSumasSaldo&standAlone=true";
     }
-
     abrirReporte({
       baseUrlReporte: baseUrl,
       parameters: {
@@ -61,10 +61,6 @@ export class ReportesComponent {
         todo: this.todo.toString(),
       }
     });
-    //abrirReporte();
-
-
-
   };
   cambiarPeriodos = (gestion: any) => {
     //Cambias los periodos a los periodos de la gestion seleccionada
