@@ -144,8 +144,11 @@ export class CuentasComponent {
 
 interface Data {
   label: string;
-  children?: Data[];
+  children?: Data[] | undefined;
+  key: any;
+  data: any;
 }
+
 
 interface Value {
   id: string;
@@ -159,7 +162,7 @@ interface Value {
 
 
 
-function TreeMaker(values: Value[], parentId: string | null = null): Data[] {
+/* export function TreeMaker(values: Value[], parentId: string | null = null): Data[] {
   const filteredValues = values.filter(value => value.padre === parentId);
 
   return filteredValues.map(value => {
@@ -167,6 +170,34 @@ function TreeMaker(values: Value[], parentId: string | null = null): Data[] {
     return {
       expanded: true,
       label: value.id,
+      data: value,
+      ...(children.length > 0 && { children })
+    };
+  });
+} */
+
+export function TreeMaker(values: Value[], parentId: string | null = null): Data[] {
+  const filteredValues = values.filter(value => value.padre === parentId);
+  return filteredValues.map(value => {
+    const children = TreeMaker(values, value.id);
+    return {
+      key: value.id, // Add the required 'key' property here
+      label: value.id,
+      data: value,
+      ...(children.length > 0 && { children })
+    };
+  });
+}
+
+
+
+export function TreeMakerGeneric<T extends { [key: string]: any; }>(values: T[], parentId: string | null = null, parentKey: string = 'categoria_id'): Data[] {
+  const filteredValues = values.filter(value => value[parentKey] === parentId);
+  return filteredValues.map(value => {
+    const children = TreeMakerGeneric(values, value['id'], parentKey);
+    return {
+      label: value['id'],// Add the required 'label' property here
+      key: value['id'],
       data: value,
       ...(children.length > 0 && { children })
     };

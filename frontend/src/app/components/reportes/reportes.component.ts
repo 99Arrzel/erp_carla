@@ -19,6 +19,39 @@ export class ReportesComponent {
   http = inject(HttpClient);
   reportes =
     ['Balance Inicial', 'Libro Diario', 'Libro Mayor', 'Sumas y Saldos'];
+
+  id_gestion_bi: number = 0;
+  id_monedaa_bi: number = 0;
+  verReporteBI = () => {
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteBalanceInicial&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_moneda: this.id_monedaa_bi.toString(),
+        id_gestion: this.id_gestion_bi.toString(),
+      }
+    });
+  };
+  verReporteLD = () => {
+    this.id_gestion_ld;
+    this.id_periodo_ld;
+    this.id_moneda_ld;
+    this.todo_ld;
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteLibroDiario&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_moneda: this.id_moneda_ld.toString(),
+        id_periodo: this.id_periodo_ld.toString(),
+        id_gestion: this.id_gestion_ld.toString(),
+        traer_todo: this.todo_ld.toString(),
+        todos: this.todo_ld.toString(),
+        todo: this.todo_ld.toString(),
+      }
+    });
+  };
+
+
   verReporte = (data: any) => {
     //console.log(this.gestion, this.periodo, this.moneda, this.todo);
     console.log(data);
@@ -66,15 +99,92 @@ export class ReportesComponent {
     //Cambias los periodos a los periodos de la gestion seleccionada
     this.periodos = gestion.periodos;
   };
-  setActionGestion = (gestion: any) => {
-    this.periodos = gestion.source.value.periodos;
-    this.gestion = gestion.source.value.id;
+  setActionGestionBI = (gestion: any) => {
+    this.id_gestion_bi = gestion.source.value.id;
   };
-  setActionPeriodo = (periodo: any) => {
-    this.periodo = periodo.source.value.id;
+  id_gestion_ld = 0;
+  setActionGestionLD = (gestion: any) => {
+    this.id_gestion_bi = gestion.source.value.id;
+    this.periodosLD = gestion.source.value.periodos;
   };
-  setActionMoneda = (moneda: any) => {
-    this.moneda = moneda.source.value.id;
+  periodosLD: any = [];
+  id_periodo_ld = 0;
+  setActionPeriodoLD = (periodo: any) => {
+    this.id_periodo_ld = periodo.source.value.id;
+  };
+  id_moneda_ld = 0;
+  setActionMonedaLD = (moneda: any) => {
+    this.id_moneda_ld = moneda.source.value.id;
+  };
+  todo_ld = "SI";
+  setActionTodoLD = (todo: any) => {
+    console.log(todo.source.value); //?????????
+    this.todo_ld = todo.source.value;
+  };
+
+  /* LM */
+  id_gestion_lm = 0;
+  setActionGestionLM = (gestion: any) => {
+    this.id_gestion_lm = gestion.source.value.id;
+    this.periodosLM = gestion.source.value.periodos;
+  };
+  periodosLM: any = [];
+  id_periodo_lm = 0;
+  setActionPeriodoLM = (periodo: any) => {
+    this.id_periodo_lm = periodo.source.value.id;
+  };
+  id_moneda_lm = 0;
+  setActionMonedaLM = (moneda: any) => {
+    this.id_moneda_lm = moneda.source.value.id;
+  };
+  todo_lm = "SI";
+  setActionTodoLM = (todo: any) => {
+    console.log(todo.source.value); //?????????
+    this.todo_lm = todo.source.value;
+  };
+  verReporteLM = () => {
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteLibroMayor&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_moneda: this.id_moneda_lm.toString(),
+        id_periodo: this.id_periodo_lm.toString(),
+        id_gestion: this.id_gestion_lm.toString(),
+        traer_todo: this.todo_lm.toString(),
+        todos: this.todo_lm.toString(),
+        todo: this.todo_lm.toString(),
+      }
+    });
+  };
+  /* === */
+
+  /* Sumas y saldos */
+  id_gestion_ss = 0;
+
+  setActionGestionSS = (gestion: any) => {
+    this.id_gestion_ss = gestion.source.value.id;
+  };
+  id_moneda_ss = 0;
+  setActionMonedaSS = (moneda: any) => {
+    this.id_moneda_ss = moneda.source.value.id;
+  };
+  verReporteSS = () => {
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteSumasSaldo&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_moneda: this.id_moneda_ss.toString(),
+        id_gestion: this.id_gestion_ss.toString(),
+      }
+    });
+  };
+
+
+  /* ========= */
+
+
+  setActionMonedaBI = (moneda: any) => {
+    this.id_monedaa_bi = moneda.source.value.id;
   };
   setActionTodo = (todo: any) => {
     if (this.todo == "SI") {

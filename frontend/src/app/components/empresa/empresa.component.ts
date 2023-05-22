@@ -37,6 +37,13 @@ export class EmpresaComponent {
     localStorage.removeItem("usuario");
     window.location.reload();
   }
+  categorias() {
+    this.router.navigate(["empresa/" + this.empresa.id + "/categorias"]);
+  }
+  articulos() {
+    this.router.navigate(["empresa/" + this.empresa.id + "/articulos"]);
+  }
+
   gestiones() {
     this.router.navigate(["empresa/" + this.empresa.id + "/gestiones"]);
   }
@@ -57,6 +64,7 @@ export class EmpresaComponent {
       id: id
     }, {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: "Bearer " + localStorage.getItem("token")
       }
     }).subscribe((data: any) => {

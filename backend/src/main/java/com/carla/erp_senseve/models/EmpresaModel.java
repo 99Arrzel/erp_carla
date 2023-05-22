@@ -51,6 +51,19 @@ public class EmpresaModel{
 
     @OneToMany(mappedBy = "empresa")
     @JsonManagedReference(value = "empresa-comprobante")
+    @JsonIgnore
     private List<ComprobanteModel> comprobantes;
+
+    //Categorias
+    @OneToMany(mappedBy = "empresa")
+    @JsonManagedReference(value = "empresa-categoria")
+    @JsonIgnore
+    private List<CategoriaModel> categorias;
+
+    //Articulos
+    @OneToMany(mappedBy = "empresa")
+    @JsonManagedReference(value = "empresa-articulo")
+    @JsonIgnore
+    private List<ArticuloModel> articulos;
 
 }

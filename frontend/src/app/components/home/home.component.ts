@@ -56,6 +56,7 @@ export class HomeComponent {
   getUpdatedEmpresas = async () => {
     const response = this.http.get<Empresa[]>(`${hostUrl}/api/empresa/mis_empresas`, {
       headers: {
+        'Content-Type': 'application/json',
         Authorization: "Bearer " + localStorage.getItem("token")
       }
     });

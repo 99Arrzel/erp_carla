@@ -11,6 +11,8 @@ import { MonedasComponent } from './components/monedas/monedas.component';
 import { ComprobantesComponent } from './components/comprobantes/comprobantes.component';
 import { CrearComprobanteComponent } from './components/comprobantes/crear-comprobante/crear-comprobante.component';
 import { ReportesComponent } from './components/reportes/reportes.component';
+import { CategoriasComponent } from './components/categorias/categorias.component';
+import { ArticulosComponent } from './components/articulos/articulos.component';
 
 export const hostUrl = 'http://localhost:8085';
 export const reportUrl = 'http://localhost:8080';
@@ -61,6 +63,8 @@ const routes: Routes = [
     path: 'empresa/:id', component: EmpresaComponent, children: [
       { path: 'configuracion/moneda', component: MonedasComponent },
       { path: 'reportes', component: ReportesComponent },
+      { path: 'categorias', component: CategoriasComponent },
+      { path: 'articulos', component: ArticulosComponent },
       { path: 'configuracion/comprobantes', component: ComprobantesComponent },
       { path: 'configuracion/comprobantes/crear', component: CrearComprobanteComponent },
       { path: 'gestiones', component: GestionesComponent },

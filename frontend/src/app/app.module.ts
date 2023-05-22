@@ -40,6 +40,10 @@ import { ComprobantesComponent } from './components/comprobantes/comprobantes.co
 import { CrearComprobanteComponent } from './components/comprobantes/crear-comprobante/crear-comprobante.component';
 import { DialogDetallesComprobanteComponent } from './components/comprobantes/dialog-detalles-comprobante/dialog-detalles-comprobante.component';
 import { ReportesComponent } from './components/reportes/reportes.component';
+import { CategoriasComponent } from './components/categorias/categorias.component';
+import { ArticulosComponent } from './components/articulos/articulos.component';
+import { CrearCategoriaComponent } from './components/categorias/crear-categoria/crear-categoria.component';
+import { EditarCategoriaComponent } from './components/categorias/editar-categoria/editar-categoria.component';
 export function handleUnauthorizedError(e: HttpErrorResponse) {
   if (e.status == 401) {
     localStorage.removeItem("token");
@@ -76,6 +80,10 @@ export function handleMsgError(e: HttpErrorResponse) {
     CrearComprobanteComponent,
     DialogDetallesComprobanteComponent,
     ReportesComponent,
+    CategoriasComponent,
+    ArticulosComponent,
+    CrearCategoriaComponent,
+    EditarCategoriaComponent,
 
   ],
   imports: [

@@ -69,8 +69,16 @@ public class UsuarioModel implements UserDetails, CredentialsContainer {
   @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
   @JsonManagedReference(value = "usuario-comprobante")
   private List<ComprobanteModel> comprobantes;
-
-
+  //Categoria
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+    @JsonManagedReference(value = "usuario-categoria")
+    private List<CategoriaModel> categorias;
+//Articulo
+      @JsonIgnore
+        @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY)
+        @JsonManagedReference(value = "usuario-articulo")
+        private List<ArticuloModel> articulos;
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return null; //No roles

@@ -1,0 +1,32 @@
+<p class="text-center font-bold text-2xl">Categorias</p>
+<div class="w-full">
+  <div class="p-4 flex flex-wrap justify-items-center justify-center  gap-2 w-full bg-gray-600 ">
+    <button mat-icon-button color="primary" matTooltip="Crear" (click)="openDialogCrear()">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button mat-icon-button color="basic" matTooltip="Editar" (click)="openDialogEditar()"
+      [disabled]="selectedNode ? false : true">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button mat-icon-button color="warn" matTooltip="Eliminar" (click)="openDialogDelete()"
+      [disabled]="(selectedNode ? false : true) ">
+      <mat-icon>delete</mat-icon>
+    </button>
+
+  </div>
+
+  <p-tree *ngIf="files" [value]="files" selectionMode="single" [(selection)]="selectedNode"
+    (onNodeSelect)="nodeSelect($event)" (onNodeUnselect)="nodeUnselect($event)">
+    <ng-template pTemplate="empty">
+      Sin categorias
+    </ng-template>
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Nombre y Descripción</th>
+      </tr>
+    </ng-template>
+    <ng-template let-node pTemplate="default">
+      {{node.data.nombre + " - " +node.data.descripcion }}
+    </ng-template>
+  </p-tree>
+</div>

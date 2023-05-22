@@ -27,7 +27,6 @@ export class DialogCuentaComponent {
   });
   http = inject(HttpClient);
   crearCuenta() {
-
     if (this.cuentaForm.value.nombre?.trim() == "") {
       Notify.failure("El nombre de la cuenta no puede estar vacío");
       return;
@@ -50,11 +49,8 @@ export class DialogCuentaComponent {
         Notify.failure(e.error?.msg);
       },
     });
-
   }
   titulo = 'Crear Cuenta';
-
-
   ngOnInit(): void {
     if (this.data.nodo && this.data.accion == "Crear") {
       this.titulo = 'Crear Subcuenta';
@@ -63,7 +59,6 @@ export class DialogCuentaComponent {
       this.titulo = 'Editar Cuenta';
       this.cuentaForm.controls.nombre.setValue(this.data.nodo?.nombre as string);
     }
-
   }
   constructor(
     public dialogRef: MatDialogRef<DialogCuentaComponent>,
