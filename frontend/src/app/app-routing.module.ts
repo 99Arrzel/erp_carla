@@ -13,6 +13,11 @@ import { CrearComprobanteComponent } from './components/comprobantes/crear-compr
 import { ReportesComponent } from './components/reportes/reportes.component';
 import { CategoriasComponent } from './components/categorias/categorias.component';
 import { ArticulosComponent } from './components/articulos/articulos.component';
+import { CuentasIntegracionComponent } from './components/cuentas-integracion/cuentas-integracion.component';
+import { NotasCompraComponent } from './components/notas-compra/notas-compra.component';
+import { NotasVentaComponent } from './components/notas-venta/notas-venta.component';
+import { CrearNotaCompraComponent } from './components/notas-compra/crear-nota-compra/crear-nota-compra.component';
+import { CrearNotaVentaComponent } from './components/notas-venta/crear-nota-venta/crear-nota-venta.component';
 
 export const hostUrl = 'http://localhost:8085';
 export const reportUrl = 'http://localhost:8080';
@@ -63,8 +68,15 @@ const routes: Routes = [
     path: 'empresa/:id', component: EmpresaComponent, children: [
       { path: 'configuracion/moneda', component: MonedasComponent },
       { path: 'reportes', component: ReportesComponent },
+      { path: 'integracion', component: CuentasIntegracionComponent },
       { path: 'categorias', component: CategoriasComponent },
       { path: 'articulos', component: ArticulosComponent },
+      { path: 'notas_compra', component: NotasCompraComponent },
+      { path: 'notas_compra/crear', component: CrearNotaCompraComponent },
+
+      { path: 'notas_venta', component: NotasVentaComponent },
+      { path: 'notas_venta/crear', component: CrearNotaVentaComponent },
+
       { path: 'configuracion/comprobantes', component: ComprobantesComponent },
       { path: 'configuracion/comprobantes/crear', component: CrearComprobanteComponent },
       { path: 'gestiones', component: GestionesComponent },

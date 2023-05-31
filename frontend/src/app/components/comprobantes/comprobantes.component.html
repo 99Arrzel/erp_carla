@@ -20,27 +20,6 @@
       <mat-icon>description</mat-icon>
     </button>
   </div>
-  <!-- <p-table [value]="comprobantes" [paginator]="true" [rows]="10" [responsive]="true" [columns]="cols">
-    <ng-template pTemplate="header" let-columns>
-      <tr>
-        <th *ngFor="let col of columns">
-          {{col}}
-        </th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-comprobante>
-      <tr>
-        <td>{{comprobante.glosa}}</td>
-        <td>{{comprobante.serie}}</td>
-        <td>{{comprobante.tipo}}</td>
-        <td>{{comprobante.moneda_nombre}}</td>
-        <td>{{comprobante.tc}}</td>
-        <td>{{comprobante.estado}}</td>
-        <td>{{comprobante.fecha}}</td>
-      </tr>
-    </ng-template>
-  </p-table> -->
-  <!-- Seleccionable -->
   <p-table [value]="comprobantes" [columns]="cols" selectionMode="single" [(selection)]="selectedComprobante">
 
     <ng-template pTemplate="header" let-columns>

@@ -1,32 +1,27 @@
-
-  <div>
+<div class="m-4">
   <h2 class="text-center">Parametros del nuevo comprobante</h2>
   <form [formGroup]="comprobante">
     <!-- Inputs de serie, glosa, tipo de cambio, moneda, tipo y fecha -->
     <div class="gap-2  flex flex-wrap justify-center">
-      <div >
+      <div>
         <mat-form-field appearance="fill">
           <mat-label>Serie</mat-label>
-         <input matInput placeholder="Serie" [value]="serie" (input)="serie = serie" disabled="true">
+          <input matInput placeholder="Serie" [value]="serie" (input)="serie = serie" disabled="true">
         </mat-form-field>
       </div>
-      <div >
+      <div>
         <mat-form-field appearance="fill">
           <mat-label>Glosa</mat-label>
           <input matInput placeholder="Glosa" formControlName="glosa">
         </mat-form-field>
       </div>
-      <div >
+      <div>
         <mat-form-field appearance="fill">
           <mat-label>Tipo de cambio</mat-label>
-          <input
-          [min]="min_tc"
-          [max]="max_tc"
-          type="number"
-          matInput placeholder="Tipo de cambio" formControlName="tc">
+          <input [min]="min_tc" [max]="max_tc" type="number" matInput placeholder="Tipo de cambio" formControlName="tc">
         </mat-form-field>
       </div>
-      <div >
+      <div>
         <!-- <mat-form-field appearance="fill">
           <mat-label>Moneda</mat-label>
           <mat-select formControlName="moneda">
@@ -45,7 +40,7 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div >
+      <div>
         <mat-form-field appearance="fill">
           <mat-label>Tipo</mat-label>
           <mat-select formControlName="tipo">
@@ -55,7 +50,7 @@
           </mat-select>
         </mat-form-field>
       </div>
-      <div >
+      <div>
         <mat-form-field appearance="fill">
           <mat-label>Fecha</mat-label>
           <input matInput [matDatepicker]="picker" placeholder="Fecha" formControlName="fecha">
@@ -71,13 +66,13 @@
     <!-- Detalles debe tener 4 cosas, glosaa, cuenta, debe, haber-->
     <form [formGroup]="detalle" class="mx-auto">
       <div class="flex  gap-4 flex-wrap  justify-center">
-        <div >
+        <div>
           <mat-form-field appearance="fill">
             <mat-label>Glosa</mat-label>
             <input matInput placeholder="Glosa" formControlName="glosa">
           </mat-form-field>
         </div>
-        <div >
+        <div>
 
           <!-- <mat-form-field appearance="fill">
             <mat-label>Cuenta</mat-label>
@@ -93,20 +88,20 @@
             </mat-select>
           </mat-form-field>
         </div>
-        <div >
+        <div>
           <mat-form-field appearance="fill">
             <mat-label>Debe</mat-label>
             <input matInput placeholder="Debe" type="number" min="0" formControlName="debe">
           </mat-form-field>
         </div>
-        <div >
+        <div>
           <mat-form-field appearance="fill">
             <mat-label>Haber</mat-label>
             <input matInput placeholder="Haber" type="number" min="0" formControlName="haber">
           </mat-form-field>
         </div>
         <div class="col-span-2   bg-gray-600 ">
-          <button type="button" class="p-4"  (click)="agregarDetalle()">
+          <button type="button" class="p-4" (click)="agregarDetalle()">
             +
           </button>
         </div>
@@ -114,10 +109,11 @@
     </form>
   </div>
   <!-- Finalmente una tabla con los detalles -->
-  <p-table [value]="comprobante.value.detalles ?? []" [paginator]="true" [rows]="10" [responsive]="true" [columns]="['Glosa', 'Cuenta', 'Debe', 'Haber', 'Debe Alternativo', 'Haber Alternativo']">
+  <p-table [value]="comprobante.value.detalles ?? []" [paginator]="true" [rows]="10" [responsive]="true"
+    [columns]="['Glosa', 'Cuenta', 'Debe', 'Haber']">
     <ng-template pTemplate="header" let-columns>
       <tr>
-        <th *ngFor="let col of ['Glosa', 'Cuenta', 'Debe', 'Haber', 'Debe Alternativo', 'Haber Alternativo']">
+        <th *ngFor="let col of ['Glosa', 'Cuenta', 'Debe', 'Haber']">
           {{col}}
         </th>
       </tr>
@@ -128,8 +124,8 @@
         <td>{{detalle.cuenta.nombre}}</td>
         <td>{{detalle.debe}}</td>
         <td>{{detalle.haber}}</td>
-        <td>{{detalle.debe_alt}}</td>
-        <td>{{detalle.haber_alt}}</td>
+        <!-- <td>{{detalle.debe_alt}}</td>
+        <td>{{detalle.haber_alt}}</td> -->
       </tr>
     </ng-template>
     <!-- Footer para las columnas debe y haber que sean su suma -->
@@ -139,8 +135,7 @@
         <td>Total:</td>
         <td>{{sumarDebe()}}</td>
         <td>{{sumarHaber()}}</td>
-        <td></td>
-        <td></td>
+
 
       </tr>
     </ng-template>
@@ -151,5 +146,3 @@
     </button>
   </div>
 </div>
-
-

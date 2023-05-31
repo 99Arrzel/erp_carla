@@ -13,6 +13,4 @@ public class LotesCompraRequest {
     public Float cantidad;
     public Float precio;
     public Date fecha_vencimiento;
-
-
 }

@@ -22,6 +22,7 @@ import { GestionesComponent } from './components/gestiones/gestiones.component';
 import { CuentasComponent } from './components/cuentas/cuentas.component';
 import { MatTableModule } from '@angular/material/table';
 import { DialogGestionComponent } from './components/gestiones/dialog-gestion/dialog-gestion.component';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 //mat-checkbox
@@ -44,6 +45,11 @@ import { CategoriasComponent } from './components/categorias/categorias.componen
 import { ArticulosComponent } from './components/articulos/articulos.component';
 import { CrearCategoriaComponent } from './components/categorias/crear-categoria/crear-categoria.component';
 import { EditarCategoriaComponent } from './components/categorias/editar-categoria/editar-categoria.component';
+import { CuentasIntegracionComponent } from './components/cuentas-integracion/cuentas-integracion.component';
+import { NotasCompraComponent } from './components/notas-compra/notas-compra.component';
+import { NotasVentaComponent } from './components/notas-venta/notas-venta.component';
+import { CrearNotaCompraComponent } from './components/notas-compra/crear-nota-compra/crear-nota-compra.component';
+import { CrearNotaVentaComponent } from './components/notas-venta/crear-nota-venta/crear-nota-venta.component';
 export function handleUnauthorizedError(e: HttpErrorResponse) {
   if (e.status == 401) {
     localStorage.removeItem("token");
@@ -84,6 +90,12 @@ export function handleMsgError(e: HttpErrorResponse) {
     ArticulosComponent,
     CrearCategoriaComponent,
     EditarCategoriaComponent,
+    CuentasIntegracionComponent,
+    NotasCompraComponent,
+    NotasVentaComponent,
+    CrearNotaCompraComponent,
+    CrearNotaVentaComponent,
+
 
   ],
   imports: [
@@ -107,7 +119,9 @@ export function handleMsgError(e: HttpErrorResponse) {
     TableModule,
     TreeModule,
     MatSelectModule,
-    InputNumberModule
+    InputNumberModule,
+    MatSlideToggleModule
+
 
   ],
   providers: [],

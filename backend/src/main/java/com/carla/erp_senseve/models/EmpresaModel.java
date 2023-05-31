@@ -3,7 +3,9 @@ package com.carla.erp_senseve.models;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -13,10 +15,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="empresas")
+@Table(name = "empresas")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class EmpresaModel{
+public class EmpresaModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,7 +36,7 @@ public class EmpresaModel{
     @NotNull
     private Boolean estado = true;
     @NotNull
-    @ManyToOne(fetch =  FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference(value = "usuario-empresa")
     private UsuarioModel usuario;
 
@@ -65,5 +67,15 @@ public class EmpresaModel{
     @JsonManagedReference(value = "empresa-articulo")
     @JsonIgnore
     private List<ArticuloModel> articulos;
+    //Cuenta de Integracion, solo una siempre por empresa
+    @OneToMany(mappedBy = "empresa")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuentaIntegracion;
+
+    //Notas
+    @OneToMany(mappedBy = "empresa")
+    @JsonIgnore
+    private List<NotaModel> notas;
+
 
 }

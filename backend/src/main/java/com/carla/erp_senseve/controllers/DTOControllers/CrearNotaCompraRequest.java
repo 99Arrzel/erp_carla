@@ -9,13 +9,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class CrearNotaRequest {
+public class CrearNotaCompraRequest {
     public Date fecha;
     public String descripcion;
     public Long empresa_id;
     public List<LotesCompraRequest> lotes;
 
-    public List<LotesCompraRequest> getLotes() {
-        return lotes;
-    }
+    
 }

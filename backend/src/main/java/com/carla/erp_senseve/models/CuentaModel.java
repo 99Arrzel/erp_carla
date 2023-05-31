@@ -36,6 +36,38 @@ public class CuentaModel{
     @JsonManagedReference(value = "detalles-cuenta")
     private List<DetalleComprobanteModel> detalle_comprobantes;
 
+    @OneToMany(mappedBy = "cuenta_caja")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_caja;
+    @OneToMany(mappedBy = "cuenta_credito_fiscal")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_credito_fiscal;
+    @OneToMany(mappedBy = "cuenta_debito_fiscal")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_debito_fiscal;
+    @OneToMany(mappedBy = "cuenta_ventas")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_ventas;
+    @OneToMany(mappedBy = "cuenta_compras")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_compras;
+    @OneToMany(mappedBy = "cuenta_it")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_it;
+    @OneToMany(mappedBy = "cuenta_it_por_pagar")
+    @JsonIgnore
+    private List<CuentasIntegracion> cuenta_it_por_pagar;
+
+
+
+
+
+
+
+
+
+
+
     //No migrar
     @Transient
     private DetalleComprobanteModel unicodetalle;

@@ -32,12 +32,12 @@ public class ArticuloModel {
     private Float precio;
 
     //usuario
-    @ManyToOne(fetch =  FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private UsuarioModel usuario;
 
     //empresa
-    @ManyToOne(fetch =  FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private EmpresaModel empresa;
@@ -57,5 +57,7 @@ public class ArticuloModel {
     )
     private List<CategoriaModel> categoria;
 
-
+    //Lote
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "articulo")
+    private List<LotesModel> lotes;
 }

@@ -59,6 +59,16 @@ export class EmpresaComponent {
   comprobantes() {
     this.router.navigate(["empresa/" + this.empresa.id + "/configuracion/comprobantes"]);
   }
+  notas_compra() {
+    this.router.navigate(["empresa/" + this.empresa.id + "/notas_compra"]);
+  }
+  notas_venta() {
+    this.router.navigate(["empresa/" + this.empresa.id + "/notas_venta"]);
+  }
+
+  integracion() {
+    this.router.navigate(["empresa/" + this.empresa.id + "/integracion"]);
+  }
   fetchEmpresa(id: number) {
     this.http.post(`${hostUrl}/api/empresa/una_empresa`, {
       id: id

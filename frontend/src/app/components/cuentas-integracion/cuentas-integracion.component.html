@@ -1,0 +1,102 @@
+<!-- Dropdowns de tipo detalle -->
+<!-- Caja, credito fiscal, debito fiscal, compras, ventas, it, it por pagar -->
+<!-- <p>Moneda Alternativa</p>
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label>Elige una</mat-label>
+        <mat-select formControlName="monedaAlternativa">
+          <mat-select-trigger>
+            {{monedaForm.get('monedaAlternativa')?.value?.nombre}}
+          </mat-select-trigger>
+          <mat-option *ngFor="let moneda of monedas" [value]="moneda">{{moneda.nombre}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+Tipo este de monedas -->
+<div class="m-4" [formGroup]="cuenta_integracion_form">
+  <!-- Un switch para activo o inactiov -->
+  <p class="font-bold text-2xl">Cuentas de integración</p>
+  <mat-slide-toggle class="mb-4" formControlName="activo" color="primary">Activo</mat-slide-toggle>
+
+  <p>Caja</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para caja</mat-label>
+    <mat-select formControlName="caja">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('caja')?.value?.nombre}}
+      </mat-select-trigger>
+      <!-- Disabled if it has been selected -->
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p>Credito Fiscal</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para credito fiscal</mat-label>
+    <mat-select formControlName="credito_fiscal">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('credito_fiscal')?.value?.nombre}}
+      </mat-select-trigger>
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p>Debito Fiscal</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para debito fiscal</mat-label>
+    <mat-select formControlName="debito_fiscal">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('debito_fiscal')?.value?.nombre}}
+      </mat-select-trigger>
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p>Compras</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para compras</mat-label>
+    <mat-select formControlName="compras">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('compras')?.value?.nombre}}
+      </mat-select-trigger>
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p>Ventas</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para ventas</mat-label>
+    <mat-select formControlName="ventas">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('ventas')?.value?.nombre}}
+      </mat-select-trigger>
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p>IT</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para IT</mat-label>
+    <mat-select formControlName="it">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('it')?.value?.nombre}}
+      </mat-select-trigger>
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <p>IT por pagar</p>
+  <mat-form-field class="w-full" appearance="fill">
+    <mat-label>Elige una cuenta para IT por pagar</mat-label>
+    <mat-select formControlName="it_por_pagar">
+      <mat-select-trigger>
+        {{cuenta_integracion_form.get('it_por_pagar')?.value?.nombre}}
+      </mat-select-trigger>
+      <mat-option *ngFor="let cuenta of cuentas" [disabled]="isDisabled(cuenta.id)"
+        [value]="cuenta">{{cuenta.nombre}}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Botton de guardar -->
+  <button mat-icon-button color="primary" matTooltip="Guardar" (click)="guardar()">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>

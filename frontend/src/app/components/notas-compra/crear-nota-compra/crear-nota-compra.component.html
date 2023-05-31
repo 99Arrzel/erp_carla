@@ -1,0 +1,74 @@
+<div class="m-4">
+  <h1 class="font-bold">Crear nota de compra</h1>
+
+  <!-- Nro input disabled -->
+  <!-- Fecha con la seleccion de hoy -->
+  <!-- Input descripcion -->
+  <!-- Boton -->
+
+  <!-- notaCompra formgroup -->
+  <div class="flex gap-2" [formGroup]="notaCompra">
+    <div class="w-1/2">
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label>Nro</mat-label>
+        <input matInput formControlName="nro_nota" [disabled]="true">
+      </mat-form-field>
+    </div>
+    <div class="w-1/2">
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="pickerFecha" formControlName="fecha">
+        <mat-datepicker-toggle matSuffix [for]="pickerFecha"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFecha></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <!-- Descripcion -->
+    <div class="w-full">
+      <mat-form-field class="w-full" appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput formControlName="descripcion">
+      </mat-form-field>
+    </div>
+    <!-- Boton -->
+    <div class="w-full">
+      <button mat-raised-button color="primary" (click)="crearNota()">Crear</button>
+    </div>
+  </div>
+
+  <div class="flex gap-2" [formGroup]="lotes">
+    <!-- Ahora para los detalles, hay que poner un dropdown con articulos  -->
+    <mat-form-field class="w-80" appearance="fill">
+      <mat-label>Elige un articulo</mat-label>
+      <mat-select formControlName="caja">
+        <mat-select-trigger>
+          {{lotes.get('articulo')?.value?.nombre}}
+        </mat-select-trigger>
+        <!-- Disabled if it has been selected -->
+        <mat-option *ngFor="let articulo of articulos" [disabled]="isDisabled(articulo.id)"
+          [value]="articulo">{{articulo.nombre}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <!-- Input para fecha de vencimiento -->
+    <mat-form-field class="w-80" appearance="fill">
+      <mat-label>Fecha de vencimiento</mat-label>
+      <input matInput [matDatepicker]="pickerFechaVencimiento" formControlName="fecha_vencimiento">
+      <mat-datepicker-toggle matSuffix [for]="pickerFechaVencimiento"></mat-datepicker-toggle>
+      <mat-datepicker #pickerFechaVencimiento></mat-datepicker>
+    </mat-form-field>
+
+
+    <!-- Input para cantidad -->
+    <!-- Input para precio -->
+    <!-- Un input dissabled con el subtotal calculado en tiempo real -->
+    <!--BOton para agregar -->
+
+    <div class="w-full">
+      <button mat-raised-button color="primary" (click)="addLote()">Añadir</button>
+    </div>
+  </div>
+
+
+
+
+
+</div>
