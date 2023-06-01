@@ -1,21 +1,15 @@
 <div class="m-4">
   <h1 class="font-bold">Crear nota de compra</h1>
 
-  <!-- Nro input disabled -->
-  <!-- Fecha con la seleccion de hoy -->
-  <!-- Input descripcion -->
-  <!-- Boton -->
-
-  <!-- notaCompra formgroup -->
-  <div class="flex gap-2" [formGroup]="notaCompra">
-    <div class="w-1/2">
-      <mat-form-field class="w-full" appearance="fill">
+  <div class="flex  gap-2" [formGroup]="notaCompra">
+    <div>
+      <mat-form-field class="w-40" appearance="fill">
         <mat-label>Nro</mat-label>
         <input matInput formControlName="nro_nota" [disabled]="true">
       </mat-form-field>
     </div>
-    <div class="w-1/2">
-      <mat-form-field class="w-full" appearance="fill">
+    <div>
+      <mat-form-field class="w-80" appearance="fill">
         <mat-label>Fecha</mat-label>
         <input matInput [matDatepicker]="pickerFecha" formControlName="fecha">
         <mat-datepicker-toggle matSuffix [for]="pickerFecha"></mat-datepicker-toggle>
@@ -23,52 +17,91 @@
       </mat-form-field>
     </div>
     <!-- Descripcion -->
-    <div class="w-full">
-      <mat-form-field class="w-full" appearance="fill">
+    <div>
+      <mat-form-field class="w-80" appearance="fill">
         <mat-label>Descripción</mat-label>
         <input matInput formControlName="descripcion">
       </mat-form-field>
     </div>
     <!-- Boton -->
-    <div class="w-full">
+    <div>
       <button mat-raised-button color="primary" (click)="crearNota()">Crear</button>
     </div>
   </div>
 
-  <div class="flex gap-2" [formGroup]="lotes">
+  <div class="flex flex-wrap gap-2" [formGroup]="lotes">
     <!-- Ahora para los detalles, hay que poner un dropdown con articulos  -->
     <mat-form-field class="w-80" appearance="fill">
       <mat-label>Elige un articulo</mat-label>
-      <mat-select formControlName="caja">
+      <mat-select formControlName="articulo">
         <mat-select-trigger>
           {{lotes.get('articulo')?.value?.nombre}}
         </mat-select-trigger>
         <!-- Disabled if it has been selected -->
-        <mat-option *ngFor="let articulo of articulos" [disabled]="isDisabled(articulo.id)"
+        <mat-option *ngFor="let articulo of articulos" [disabled]="disabledIfIsInNotas(articulo.id)"
           [value]="articulo">{{articulo.nombre}}</mat-option>
       </mat-select>
     </mat-form-field>
     <!-- Input para fecha de vencimiento -->
     <mat-form-field class="w-80" appearance="fill">
-      <mat-label>Fecha de vencimiento</mat-label>
+      <mat-label>F. de vencimiento</mat-label>
       <input matInput [matDatepicker]="pickerFechaVencimiento" formControlName="fecha_vencimiento">
       <mat-datepicker-toggle matSuffix [for]="pickerFechaVencimiento"></mat-datepicker-toggle>
       <mat-datepicker #pickerFechaVencimiento></mat-datepicker>
     </mat-form-field>
-
-
     <!-- Input para cantidad -->
+    <mat-form-field class="w-40" appearance="fill">
+      <mat-label>Cantidad</mat-label>
+      <input matInput type="number" formControlName="cantidad">
+    </mat-form-field>
     <!-- Input para precio -->
+    <mat-form-field class="w-40" appearance="fill">
+      <mat-label>Precio</mat-label>
+      <input matInput type="number" formControlName="precio">
+    </mat-form-field>
+
     <!-- Un input dissabled con el subtotal calculado en tiempo real -->
+    <mat-form-field class="w-40" appearance="fill">
+      <mat-label>Subtotal</mat-label>
+      <input matInput type="number" formControlName="subtotal" [disabled]="true">
+    </mat-form-field>
     <!--BOton para agregar -->
 
-    <div class="w-full">
+    <div class="w-fit">
       <button mat-raised-button color="primary" (click)="addLote()">Añadir</button>
     </div>
   </div>
-
-
-
-
-
+  <p-table [value]="notaCompra.value.lotes" selectionMode="single" [(selection)]="selectedLote">
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th>
+          Articulo
+        </th>
+        <th>
+          F. Vencimiento
+        </th>
+        <th>
+          Cantidad
+        </th>
+        <th>
+          Precio
+        </th>
+        <th>
+          Subtotal
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-lote>
+      <tr [pSelectableRow]="lote">
+        <td>{{lote.articulo.nombre}}</td>
+        <!-- <td>{{lote.fecha_vencimiento}}</td> -->
+        <!-- <td>{{lote.fecha_vencimiento | date}}</td> -->
+        <!-- Date to local date string, not only date -->
+        <td>{{lote.fecha_vencimiento ? (lote.fecha_vencimiento | date:'dd/MM/yyyy') : "N/A"}}</td>
+        <td>{{lote.cantidad}}</td>
+        <td>{{lote.precio}}</td>
+        <td>{{lote.subtotal}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>

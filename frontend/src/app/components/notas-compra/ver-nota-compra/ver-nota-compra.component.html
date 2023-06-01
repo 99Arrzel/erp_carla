@@ -1,0 +1,67 @@
+<div class="m-4">
+  <h1 class="font-bold">Detalles de nota de compra</h1>
+
+  <div class="flex  gap-2">
+    <div>
+      <mat-form-field class="w-40" appearance="fill">
+        <mat-label>Nro</mat-label>
+        <input matInput formControlName="nro_nota" [value]="nota?.numero" [disabled]="true">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="w-80" appearance="fill">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="pickerFecha" [value]="nota?.fecha" [disabled]="true">
+        <mat-datepicker-toggle matSuffix [for]="pickerFecha"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFecha></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <!-- Descripcion -->
+    <div>
+      <mat-form-field class="w-80" appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput [value]="nota?.descripcion" [disabled]=" true">
+      </mat-form-field>
+    </div>
+    <!-- Boton -->
+    <div>
+      <button mat-raised-button color="warn" [disabled]="nota?.estado == 'ANULADO'"
+        (click)="anularNota()">Anular</button>
+    </div>
+    <!-- Terciary button go back -->
+    <div>
+      <button mat-raised-button color="basic" (click)="goBack()">Volver</button>
+    </div>
+  </div>
+
+  <p-table [value]="nota?.detalles">
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th>
+          Articulo
+        </th>
+        <th>
+          F. Vencimiento
+        </th>
+        <th>
+          Cantidad
+        </th>
+        <th>
+          Precio
+        </th>
+        <th>
+          Subtotal
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-lote>
+      <tr [pSelectableRow]="lote">
+        <td>{{lote.articulo}}</td>
+        <td>{{lote.fecha_vencimiento ? (lote.fecha_vencimiento | date:'dd/MM/yyyy') : "N/A"}}</td>
+        <td>{{lote.cantidad}}</td>
+        <td>{{lote.precio}}</td>
+        <td>{{lote.subtotal}}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

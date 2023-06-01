@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface NotasRepository extends JpaRepository<NotaModel, Long> {
 
-    @Query(value = "SELECT * FROM notas WHERE empresa_id = :empresa_id AND tipo = :tipo", nativeQuery = true)
+    @Query(value = "SELECT * FROM notas WHERE empresa_id = :empresa_id AND tipo = :tipo ORDER BY id DESC", nativeQuery = true)
     List<NotaModel> findByEmpresaIdAndTipo(
             @Param("empresa_id") Long empresa_id,
             @Param("tipo") String tipo);

@@ -18,6 +18,8 @@ import { NotasCompraComponent } from './components/notas-compra/notas-compra.com
 import { NotasVentaComponent } from './components/notas-venta/notas-venta.component';
 import { CrearNotaCompraComponent } from './components/notas-compra/crear-nota-compra/crear-nota-compra.component';
 import { CrearNotaVentaComponent } from './components/notas-venta/crear-nota-venta/crear-nota-venta.component';
+import { VerNotaCompraComponent } from './components/notas-compra/ver-nota-compra/ver-nota-compra.component';
+import { VerNotaVentaComponent } from './components/notas-venta/ver-nota-venta/ver-nota-venta.component';
 
 export const hostUrl = 'http://localhost:8085';
 export const reportUrl = 'http://localhost:8080';
@@ -73,9 +75,10 @@ const routes: Routes = [
       { path: 'articulos', component: ArticulosComponent },
       { path: 'notas_compra', component: NotasCompraComponent },
       { path: 'notas_compra/crear', component: CrearNotaCompraComponent },
-
+      { path: 'notas_compra/ver/:id_nota', component: VerNotaCompraComponent },
       { path: 'notas_venta', component: NotasVentaComponent },
       { path: 'notas_venta/crear', component: CrearNotaVentaComponent },
+      { path: 'notas_venta/ver/:id_nota', component: VerNotaVentaComponent },
 
       { path: 'configuracion/comprobantes', component: ComprobantesComponent },
       { path: 'configuracion/comprobantes/crear', component: CrearComprobanteComponent },

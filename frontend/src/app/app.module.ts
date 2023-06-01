@@ -50,6 +50,9 @@ import { NotasCompraComponent } from './components/notas-compra/notas-compra.com
 import { NotasVentaComponent } from './components/notas-venta/notas-venta.component';
 import { CrearNotaCompraComponent } from './components/notas-compra/crear-nota-compra/crear-nota-compra.component';
 import { CrearNotaVentaComponent } from './components/notas-venta/crear-nota-venta/crear-nota-venta.component';
+import { CalendarModule } from 'primeng/calendar';
+import { VerNotaCompraComponent } from './components/notas-compra/ver-nota-compra/ver-nota-compra.component';
+import { VerNotaVentaComponent } from './components/notas-venta/ver-nota-venta/ver-nota-venta.component';
 export function handleUnauthorizedError(e: HttpErrorResponse) {
   if (e.status == 401) {
     localStorage.removeItem("token");
@@ -95,6 +98,8 @@ export function handleMsgError(e: HttpErrorResponse) {
     NotasVentaComponent,
     CrearNotaCompraComponent,
     CrearNotaVentaComponent,
+    VerNotaCompraComponent,
+    VerNotaVentaComponent,
 
 
   ],
@@ -120,7 +125,9 @@ export function handleMsgError(e: HttpErrorResponse) {
     TreeModule,
     MatSelectModule,
     InputNumberModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    CalendarModule
+
 
 
   ],

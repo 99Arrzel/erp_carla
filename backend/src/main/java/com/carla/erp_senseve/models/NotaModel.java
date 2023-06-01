@@ -1,9 +1,10 @@
 package com.carla.erp_senseve.models;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,38 +24,46 @@ import java.util.List;
 @Proxy(lazy = false)
 public class NotaModel {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String nro_nota;
     private Date fecha;
     private String descripcion;
     //Empresa
     @ManyToOne(fetch = FetchType.EAGER)
+    @NotNull
+    @JsonIgnore
     @JoinColumn(name = "empresa_id")
     private EmpresaModel empresa;
 
 
     //Usuario
     @ManyToOne(fetch = FetchType.EAGER)
+
+    @JsonIgnore
     @JoinColumn(name = "usuario_id")
     private UsuarioModel usuario;
     //Comprobante
 
-
-    @Nullable
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "comprobante_id")
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JsonIgnore
+    @JoinColumn(name = "comprobante_id", nullable = true)
     private ComprobanteModel comprobante;
-
-
+    @NotNull
     private Float total;
+    @NotNull
     private String tipo;
+    @NotNull
     private String estado;
 
+
     //lote
+
+    @JsonIgnore
     @OneToMany(mappedBy = "nota", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<LotesModel> lote;
 
+    @JsonIgnore
     //detalle
     @OneToMany(mappedBy = "nota", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<DetallesModel> detalle;

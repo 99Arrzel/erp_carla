@@ -3,6 +3,7 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Notify } from 'notiflix';
 import { hostUrl } from 'src/app/app-routing.module';
 
 @Component({
@@ -22,7 +23,11 @@ export class NotasCompraComponent {
   });
 
   verNota() {
-
+    if (this.selectedNota == null) {
+      Notify.failure("Debe seleccionar una nota");
+      return;
+    }
+    this.router.navigate(["empresa/" + this.empresa_id + "/notas_compra/ver/" + this.selectedNota.id]);
   }
   crearNota() {
     this.router.navigate(["empresa/" + this.empresa_id + "/notas_compra/crear"]);
@@ -38,6 +43,9 @@ export class NotasCompraComponent {
     let id_empresa = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
     this.empresa_id = id_empresa;
     this.notaCompra.patchValue({ empresa_id: id_empresa });
+
+
+
     this.http.post(`${hostUrl}/api/notas/listar`, {
       empresa_id: id_empresa,
       tipo: 'COMPRA'

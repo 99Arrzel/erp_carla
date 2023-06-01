@@ -49,12 +49,63 @@ public class NotasController {
             return ResponseEntity.badRequest().body(e.getMessage().toString());
         }
     }
+
+    //anular_compra
+    @PostMapping(value = "/anular_compra")
+    public ResponseEntity<?> anular_compra(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> data
+    ) {
+        try {
+            return ResponseEntity.ok().body(
+                    notasService.anular_compra(
+                            data.get("nota_id")
+                    )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
     //crear_compra
     //crear_venta
-    //anular_compra
+
     //anular_venta
     //ultimo_numero
+
+    @PostMapping(value = "/ultimo_numero")
+    public ResponseEntity<?> ultimo_numero(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> data
+    ) {
+        try {
+            return ResponseEntity.ok().body(
+                    notasService.ultimo_numero(
+                            data.get("empresa_id"),
+                            data.get("tipo")
+                    )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
+
     //una_nota_compra
+    @PostMapping(value = "/una_nota_compra")
+    public ResponseEntity<?> una_nota_compra(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestBody Map<String, String> data
+    ) {
+        try {
+            return ResponseEntity.ok().body(
+                    notasService.una_nota_compra(
+                            data.get("nota_id")
+                    )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
+
     //una_nota_venta
 
 }
