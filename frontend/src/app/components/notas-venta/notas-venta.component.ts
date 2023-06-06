@@ -16,11 +16,11 @@ export class NotasVentaComponent {
 
 
   verNota() {
-
+    this.router.navigate(["empresa/" + this.empresa_id + "/notas_venta/ver/" + this.selectedNota.id]);
   }
 
   crearNota() {
-    
+    this.router.navigate(["empresa/" + this.empresa_id + "/notas_venta/crear"]);
   }
   selectedNota: any = null;
 
@@ -28,11 +28,13 @@ export class NotasVentaComponent {
   cols = ['Nº', 'Fecha', 'Descripción', 'Estado'];
 
   http = inject(HttpClient);
+  empresa_id = null as number | null;
   ngOnInit() {
     let id_empresa = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
+    this.empresa_id = id_empresa;
     this.http.post(`${hostUrl}/api/notas/listar`, {
       empresa_id: id_empresa,
-      tipo: 'COMPRA'
+      tipo: 'VENTA'
     },
       {
         headers: {

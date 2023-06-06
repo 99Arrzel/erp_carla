@@ -1,5 +1,7 @@
 package com.carla.erp_senseve.services;
 
+import com.carla.erp_senseve.controllers.EstadoResultado;
+import com.carla.erp_senseve.controllers.ReporteEstadoResultadosModel;
 import com.carla.erp_senseve.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class ReporteComprobanteService {
     CuentaService cuentaService;
     @Autowired
     PeriodoService periodoService;
+
     public ReporteComprobanteModel reporte_comprobante(String id_comprobante) {
         ReporteComprobanteModel reporteComprobanteModel = new ReporteComprobanteModel();
         //Fetch data from database using id_comprobante
@@ -37,18 +40,18 @@ public class ReporteComprobanteService {
         reporteComprobanteModel.setEmpresa(comprobanteModel.getEmpresa().getNombre());
         reporteComprobanteModel.setCambio(comprobanteModel.getTc());
         List<comprobante_detalles> comprobante_detalles_list = new ArrayList<>();
-        comprobanteModel.getDetalles().forEach( detalle -> {
-            System.out.println(detalle.getNumero());
-            System.out.println(detalle.getGlosa());
-            comprobante_detalles nuevoDetalle = new comprobante_detalles();
-            nuevoDetalle.setNumero(detalle.getNumero());
-            nuevoDetalle.setGlosa(detalle.getGlosa());
-            nuevoDetalle.setMonto_debe(detalle.getMonto_debe());
-            nuevoDetalle.setMonto_haber(detalle.getMonto_haber());
-            nuevoDetalle.setNombreCuenta(detalle.getCuenta().getNombre());
-            nuevoDetalle.setCodigoCuenta(detalle.getCuenta().getCodigo());
-            comprobante_detalles_list.add(nuevoDetalle);
-          }
+        comprobanteModel.getDetalles().forEach(detalle -> {
+                    System.out.println(detalle.getNumero());
+                    System.out.println(detalle.getGlosa());
+                    comprobante_detalles nuevoDetalle = new comprobante_detalles();
+                    nuevoDetalle.setNumero(detalle.getNumero());
+                    nuevoDetalle.setGlosa(detalle.getGlosa());
+                    nuevoDetalle.setMonto_debe(detalle.getMonto_debe());
+                    nuevoDetalle.setMonto_haber(detalle.getMonto_haber());
+                    nuevoDetalle.setNombreCuenta(detalle.getCuenta().getNombre());
+                    nuevoDetalle.setCodigoCuenta(detalle.getCuenta().getCodigo());
+                    comprobante_detalles_list.add(nuevoDetalle);
+                }
         );
         reporteComprobanteModel.setComprobante_detalles(comprobante_detalles_list);
         return reporteComprobanteModel;
@@ -63,7 +66,7 @@ public class ReporteComprobanteService {
         MonedaModel moneda = monedaService.obtenerMoneda(Long.parseLong(idMoneda));
 
         //Buscamos el primer comprobante de apertura en gestion.fecha_inicio y gestion_fecha_fin con estado Abierto
-        ComprobanteModel comprobanteModel = comprobanteService.obtenerComprobanteApertura( gestion.getFechaInicio(), gestion.getFechaFin(), gestion.getEmpresa().getId());
+        ComprobanteModel comprobanteModel = comprobanteService.obtenerComprobanteApertura(gestion.getFechaInicio(), gestion.getFechaFin(), gestion.getEmpresa().getId());
 
         //La diferencia de este reporte es que es por cuentas, las cuentas deben ser ordenadas por codigo y traer desde la base con padre null hasta el hijo que es el último, que es el detalle que tiene el comprobante
 
@@ -94,11 +97,16 @@ public class ReporteComprobanteService {
         for (int i = cuentas.size() - 1; i >= 0; i--) {
             CuentaModel cuenta = cuentas.get(i);
             if (cuenta.getPadre() != null) {
+                if (cuenta.getTotal_balance_inicial() == null) {
+                    cuenta.setTotal_balance_inicial(0.0f);
+                }
                 //cuenta.getPadre().setTotal_balance_inicial(cuenta.getPadre().getTotal_balance_inicial() + cuenta.getTotal_balance_inicial()); hay que verificar que getTotal no sea null
-                if (cuenta.getPadre().getTotal_balance_inicial() != null) {
+                if (cuenta.getPadre().getTotal_balance_inicial() != null && cuenta.getTotal_balance_inicial() != null) {
                     cuenta.getPadre().setTotal_balance_inicial(cuenta.getPadre().getTotal_balance_inicial() + cuenta.getTotal_balance_inicial());
                 } else {
-                    cuenta.getPadre().setTotal_balance_inicial(cuenta.getTotal_balance_inicial());
+                    if (cuenta.getTotal_balance_inicial() != null) {
+                        cuenta.getPadre().setTotal_balance_inicial(cuenta.getTotal_balance_inicial());
+                    }
                 }
             }
         }
@@ -133,29 +141,36 @@ public class ReporteComprobanteService {
         //Este es un reporte de comprobantes en un periodo de tiempo, es decir, desde fecha_inicio hasta fecha_fin, que puede  ser de cierto periodo o  gestion
         //La gestión es opcional, si es que se quiere ver todos los comprobantes desde el inicio de la gestion hasta la fecha_fin
         ReporteComprobanteLibroDiarioModel reporteComprobanteLibroDiarioModel = new ReporteComprobanteLibroDiarioModel();
-        Date fecha_inicio ;
+        Date fecha_inicio;
         Date fecha_fin;
         PeriodoModel periodo = null;
 
         MonedaModel moneda = monedaService.obtenerMoneda(Long.parseLong(idMoneda));
         periodo = periodoService.obtenerPeriodo(Long.parseLong(idPeriodo));
-        if(periodo == null){
+        if (periodo == null) {
             throw new RuntimeException("No existe el periodo");
         }
         //if(todos.equals() == "SI"){ Esto no está funcionando
-        if(todos != null && todos.equals("SI")){
+        if (todos != null && todos.equals("SI")) {
             fecha_inicio = periodo.getGestion().getFechaInicio();
             fecha_fin = periodo.getGestion().getFechaFin();
             reporteComprobanteLibroDiarioModel.setTodos_periodos("SI");
-        }else{
+        } else {
             reporteComprobanteLibroDiarioModel.setTodos_periodos("NO");
             fecha_inicio = periodo.getFechaInicio();
             fecha_fin = periodo.getFechaFin();
         }
-        System.out.println("Esta basura imprime todos:" + todos);
-        System.out.println(reporteComprobanteLibroDiarioModel.getTodos_periodos());
+        GestionModel gestion = periodo.getGestion();
+        System.out.println("Nombre gestion: " + gestion.getNombre());
+        //Nombre empresa
+        System.out.println("Nombre empresa: " + gestion.getEmpresa().getNombre());
 
-        List<ComprobanteModel> comprobantes = comprobanteService.obtenerComprobantesInicioFinEmpresa(fecha_inicio, fecha_fin, periodo.getGestion().getEmpresa().getId());
+        List<ComprobanteModel> comprobantes = comprobanteService.obtenerComprobantesInicioFinEmpresa(fecha_inicio, fecha_fin, gestion.getEmpresa().getId());
+
+        comprobantes.forEach(comprobante -> {
+            System.out.println(comprobante.getEmpresa().getId());
+        });
+
         //Ahora con los comprobantes armamos los detalles
         List<DetallesLibroDiario> detallesLibroDiario = new ArrayList<>();
         AtomicReference<Float> totalDebe = new AtomicReference<>(0f);
@@ -170,10 +185,10 @@ public class ReporteComprobanteService {
             detallesLibroDiario.add(nuevoDetalle);
             comprobante.getDetalles().forEach(detalle -> {
                 DetallesLibroDiario nuevoDetalle2 = new DetallesLibroDiario();
-                if(detalle.getComprobante().getMoneda().getId() != moneda.getId()) {
+                if (!detalle.getComprobante().getMoneda().getId().equals(moneda.getId())) {
                     nuevoDetalle2.setDebe(detalle.getMonto_debe() * detalle.getComprobante().getTc());
                     nuevoDetalle2.setHaber(detalle.getMonto_haber() * detalle.getComprobante().getTc());
-                }else{
+                } else {
                     nuevoDetalle2.setDebe(detalle.getMonto_debe());
                     nuevoDetalle2.setHaber(detalle.getMonto_haber());
                 }
@@ -191,7 +206,7 @@ public class ReporteComprobanteService {
         reporteComprobanteLibroDiarioModel.setTotalDebe(totalDebe.get());
         reporteComprobanteLibroDiarioModel.setTotalHaber(totalHaber.get());
         reporteComprobanteLibroDiarioModel.setPeriodo(periodo);
-        GestionModel gestion = periodo.getGestion();
+
 
         reporteComprobanteLibroDiarioModel.setEmpresa(gestion.getEmpresa().getNombre());
         reporteComprobanteLibroDiarioModel.setUsuario(periodo.getUsuario().getNombre());
@@ -204,18 +219,17 @@ public class ReporteComprobanteService {
     public ReporteComprobanteLibroMayorModel reporte_libro_mayor(String idMoneda, String idPeriodo, String todos) {
         //Esto es conseguir las cuentas, ordenarlas por numeros, de estas sacar los detalles y tener debe haber con un saldo que es siempre la resta de estos en un math.abs
         ReporteComprobanteLibroMayorModel reporteComprobanteLibroMayorModel = new ReporteComprobanteLibroMayorModel();
-        Date fecha_inicio ;
+        Date fecha_inicio;
         Date fecha_fin;
         PeriodoModel periodo = periodoService.obtenerPeriodo(Long.parseLong(idPeriodo));
-        if(periodo == null){
+        if (periodo == null) {
             throw new RuntimeException("No existe el periodo");
         }
-        if(todos != null && todos.equals("SI")) {
+        if (todos != null && todos.equals("SI")) {
             reporteComprobanteLibroMayorModel.setTodos_periodos("SI");
             fecha_inicio = periodo.getGestion().getFechaInicio();
             fecha_fin = periodo.getGestion().getFechaFin();
-        }
-        else{
+        } else {
             reporteComprobanteLibroMayorModel.setTodos_periodos("NO");
             fecha_inicio = periodo.getFechaInicio();
             fecha_fin = periodo.getFechaFin();
@@ -335,10 +349,10 @@ public class ReporteComprobanteService {
             detallesSumasSaldos.setHaber_suma(totalHaber.get());
             //ahora el debe_saldo es sumas_debe - sumas_haber
             //también el haber_saldo es sumas_haber - sumas_debe
-            if(totalDebe.get() > totalHaber.get()){
+            if (totalDebe.get() > totalHaber.get()) {
                 detallesSumasSaldos.setDebe_saldo(Math.abs(totalDebe.get() - totalHaber.get()));
                 detallesSumasSaldos.setHaber_saldo(0f);
-            }else if(totalDebe.get() < totalHaber.get()){
+            } else if (totalDebe.get() < totalHaber.get()) {
                 detallesSumasSaldos.setDebe_saldo(0f);
                 detallesSumasSaldos.setHaber_saldo(Math.abs(totalHaber.get() - totalDebe.get()));
             }
@@ -347,5 +361,99 @@ public class ReporteComprobanteService {
         });
         reporteSumasSaldosModel.setDetalles(detallesSumasSaldosList);
         return reporteSumasSaldosModel;
+    }
+
+    public ReporteEstadoResultadosModel reporte_estado_resultados(String idMoneda, String idGestion) {
+        MonedaModel moneda = monedaService.obtenerMoneda(Long.parseLong(idMoneda));
+        GestionModel gestion = gestionService.obtenerGestion(Long.parseLong(idGestion));
+        ReporteEstadoResultadosModel reporteEstadoResultadosModel = new ReporteEstadoResultadosModel();
+        reporteEstadoResultadosModel.setFecha(gestion.getFechaFin());
+
+        //Ahora hay que encontrar todos los comprantes en una gestión
+        List<ComprobanteModel> comprobantes = comprobanteService.obtenerComprobantesInicioFinEmpresa(gestion.getFechaInicio(), gestion.getFechaFin(), gestion.getEmpresa().getId());
+
+
+        //Ahora hay que encontrar las cuentas de ingresos, costos y gastos de la empresa, encontrar por códigos
+        //Ingresos es 4.?
+        List<CuentaModel> cuentasIngresos = cuentaService.obtenerCuentasPorEmpresaIngresos(gestion.getEmpresa().getId());
+        List<EstadoResultado> estadoResultadosList = new ArrayList<>();
+        cuentasIngresos.forEach(cuentaModel -> {
+            EstadoResultado estadoResultado = new EstadoResultado();
+            estadoResultado.setNombre_cuenta(cuentaModel.getNombre());
+            //estadoResultado.setSaldo(); el saldo es la suma - debe de los detalles de los comprobantes
+            Float total = 0.0f;
+            for (ComprobanteModel comprobanteModel : comprobantes) {
+                for (DetalleComprobanteModel detalleComprobanteModel : comprobanteModel.getDetalles()) {
+                    if (detalleComprobanteModel.getCuenta().getId() == cuentaModel.getId()) {
+                        if (detalleComprobanteModel.getComprobante().getMoneda().getId().equals(Long.parseLong(idMoneda))) {
+                            total += detalleComprobanteModel.getMonto_debe() * detalleComprobanteModel.getComprobante().getTc();
+                        } else {
+                            total += detalleComprobanteModel.getMonto_debe();
+                        }
+                    }
+                }
+            }
+            estadoResultado.setSaldo(total);
+            estadoResultadosList.add(estadoResultado);
+        });
+        reporteEstadoResultadosModel.setIngresos(estadoResultadosList);
+        reporteEstadoResultadosModel.setTotal_ingresos((float) estadoResultadosList.stream().mapToDouble(EstadoResultado::getSaldo).sum());
+
+        //Costos es 5.1.?
+        List<CuentaModel> cuentasCostos = cuentaService.obtenerCuentasPorEmpresaCostos(gestion.getEmpresa().getId());
+        //Repetido lo de arriba
+        List<EstadoResultado> estadoResultadosList1 = new ArrayList<>();
+        cuentasCostos.forEach(cuentaModel -> {
+            EstadoResultado estadoResultado = new EstadoResultado();
+            estadoResultado.setNombre_cuenta(cuentaModel.getNombre());
+            //estadoResultado.setSaldo(); el saldo es la suma - debe de los detalles de los comprobantes
+            Float total = 0.0f;
+            for (ComprobanteModel comprobanteModel : comprobantes) {
+                for (DetalleComprobanteModel detalleComprobanteModel : comprobanteModel.getDetalles()) {
+                    if (detalleComprobanteModel.getCuenta().getId() == cuentaModel.getId()) {
+                        if (detalleComprobanteModel.getComprobante().getMoneda().getId().equals(Long.parseLong(idMoneda))) {
+                            total += detalleComprobanteModel.getMonto_debe() * detalleComprobanteModel.getComprobante().getTc();
+                        } else {
+                            total += detalleComprobanteModel.getMonto_debe();
+                        }
+                    }
+                }
+            }
+            estadoResultado.setSaldo(total);
+            estadoResultadosList1.add(estadoResultado);
+        });
+        reporteEstadoResultadosModel.setCostos(estadoResultadosList1);
+        reporteEstadoResultadosModel.setTotal_costos((float) estadoResultadosList1.stream().mapToDouble(EstadoResultado::getSaldo).sum());
+        //Gastos es 5.2.?
+        List<CuentaModel> cuentasGastos = cuentaService.obtenerCuentasPorEmpresaGastos(gestion.getEmpresa().getId());
+        //Repetido lo de arriba
+        List<EstadoResultado> estadoResultadosList2 = new ArrayList<>();
+        cuentasGastos.forEach(cuentaModel -> {
+            EstadoResultado estadoResultado = new EstadoResultado();
+            estadoResultado.setNombre_cuenta(cuentaModel.getNombre());
+            //estadoResultado.setSaldo(); el saldo es la suma - debe de los detalles de los comprobantes
+            Float total = 0.0f;
+            for (ComprobanteModel comprobanteModel : comprobantes) {
+                for (DetalleComprobanteModel detalleComprobanteModel : comprobanteModel.getDetalles()) {
+                    if (detalleComprobanteModel.getCuenta().getId() == cuentaModel.getId()) {
+                        if (detalleComprobanteModel.getComprobante().getMoneda().getId().equals(Long.parseLong(idMoneda))) {
+                            total += detalleComprobanteModel.getMonto_debe() * detalleComprobanteModel.getComprobante().getTc();
+                        } else {
+                            total += detalleComprobanteModel.getMonto_debe();
+                        }
+                    }
+                }
+            }
+            estadoResultado.setSaldo(total);
+            estadoResultadosList2.add(estadoResultado);
+        });
+        reporteEstadoResultadosModel.setGastos(estadoResultadosList2);
+        reporteEstadoResultadosModel.setTotal_gastos((float) estadoResultadosList2.stream().mapToDouble(EstadoResultado::getSaldo).sum());
+        reporteEstadoResultadosModel.setUtilidad_operativa(reporteEstadoResultadosModel.getTotal_ingresos() - reporteEstadoResultadosModel.getTotal_costos() - reporteEstadoResultadosModel.getTotal_gastos());
+        System.out.println(reporteEstadoResultadosModel.getUtilidad_operativa());
+        System.out.println(reporteEstadoResultadosModel.getCostos());
+        System.out.println(reporteEstadoResultadosModel.getGastos());
+        System.out.println(reporteEstadoResultadosModel.getIngresos());
+        return reporteEstadoResultadosModel;
     }
 }

@@ -2,6 +2,7 @@ package com.carla.erp_senseve.services;
 
 
 import com.carla.erp_senseve.controllers.DTOControllers.CrearNotaCompraRequest;
+import com.carla.erp_senseve.controllers.DTOControllers.CrearNotaVentaRequest;
 import com.carla.erp_senseve.models.*;
 import com.carla.erp_senseve.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class NotasService {
     ComprobanteService comprobanteService;
     @Autowired
     LoteRepository lotesRepository;
+    @Autowired
+    Detallesrepository detallesRepository;
 
     public List<NotaModel> listar(String empresaId, String tipo) {
         if (empresaId == null || empresaId.isBlank()) {
@@ -235,5 +238,114 @@ public class NotasService {
         );
         dto.setDetalles(productos);
         return dto;
+    }
+
+    public NotaModel crear_venta(CrearNotaVentaRequest data) {
+        EmpresaModel empresa = empresaRepository.findById(data.getEmpresa_id()).orElseThrow(
+                () -> new RuntimeException("Empresa no encontrada")
+        );
+        ComprobanteModel comprobante = null;
+
+        Float total = data.getLotes().stream().map(l -> l.getPrecio() * l.getCantidad()).reduce(0f, Float::sum);
+        if (empresa.getCuentaIntegracion().size() > 0 && empresa.getCuentaIntegracion().get(0).getEstado() == "Activo") {
+            //Crear comprobante
+        }
+        NotaModel nota = new NotaModel();
+        nota.setDescripcion(data.getDescripcion());
+        nota.setEmpresa(empresa);
+        nota.setFecha(data.getFecha());
+        String nro = String.valueOf(notasRepository.countByEmpresaIdAndTipo(data.getEmpresa_id(), "VENTA") + 1);
+        nota.setNro_nota(nro);
+        nota.setEstado("ACTIVO");
+        nota.setTipo("VENTA");
+        nota.setTotal(total);
+        nota.setUsuario(empresa.getUsuario());
+        if (comprobante != null) {
+            nota.setComprobante(comprobante);
+        }
+        notasRepository.save(nota);
+
+        List<DetallesModel> detalles = new ArrayList<>();
+        data.getLotes().forEach(lote -> {
+            DetallesModel detalle = new DetallesModel();
+            LotesModel loteModel = lotesRepository.findById(lote.getLote_id()).orElseThrow(
+                    () -> new RuntimeException("Lote no encontrado")
+            );
+            if (loteModel.getStock() < lote.getCantidad()) {
+                notasRepository.delete(nota);
+                if (comprobante != null) {
+                    comprobanteRepository.delete(comprobante);
+                }
+                throw new RuntimeException("No hay stock suficiente");
+            }
+            detalle.setLote(loteModel);
+            detalle.setCantidad(lote.getCantidad());
+            detalle.setPrecio_venta(lote.getPrecio());
+            detalle.setNota(nota);
+            detallesRepository.save(detalle);
+            loteModel.setStock((float) (loteModel.getStock() - lote.getCantidad()));
+            ArticuloModel art = articuloRepository.findById(loteModel.getArticulo().getId()).orElseThrow(
+                    () -> new RuntimeException("Articulo no encontrado")
+            );
+            art.setStock((int) (art.getStock() - lote.getCantidad()));
+            lotesRepository.save(loteModel);
+        });
+        return nota;
+    }
+
+    public NotaVentaDTO una_nota_venta(String notaId) {
+
+        NotaModel nota = notasRepository.findById(Long.parseLong(notaId)).orElseThrow(
+                () -> new RuntimeException("Nota no encontrada")
+        );
+        NotaVentaDTO dto = new NotaVentaDTO();
+        dto.setId(nota.getId());
+        dto.setFecha(nota.getFecha());
+        dto.setNro_nota(nota.getNro_nota());
+        dto.setEstado(nota.getEstado());
+        dto.setDescripcion(nota.getDescripcion());
+        dto.setTotal(nota.getTotal());
+        List<NotaVentaDetallesDTO> productos = new ArrayList<>();
+
+        nota.getDetalle().forEach(detalle -> {
+            NotaVentaDetallesDTO producto = new NotaVentaDetallesDTO();
+            producto.setNombre_articulo(detalle.getLote().getArticulo().getNombre());
+            producto.setCantidad(detalle.getCantidad());
+            producto.setLote(detalle.getLote().getNro_lote());
+            producto.setPrecio(detalle.getPrecio_venta());
+            producto.setSubtotal(detalle.getCantidad() * detalle.getPrecio_venta());
+            productos.add(producto);
+        });
+        dto.setDetalles(productos);
+        return dto;
+    }
+
+    public NotaModel anular_venta(String notaId) {
+        NotaModel nota = notasRepository.findById(Long.parseLong(notaId)).orElseThrow(
+                () -> new RuntimeException("Nota no encontrada")
+        );
+        if (nota.getEstado().equals("ANULADO")) {
+            throw new RuntimeException("Nota ya anulada");
+        }
+        nota.setEstado("ANULADO");
+        //From each detail (Lote) remove stock
+        //los detalles no, en los lotes
+        nota.getDetalle().forEach(detalle -> {
+            LotesModel lote = detalle.getLote();
+            lote.setStock(lote.getStock() + detalle.getCantidad());
+            lotesRepository.save(lote);
+            //Restablecer lote de articulo
+            ArticuloModel art = articuloRepository.findById(lote.getArticulo().getId()).orElseThrow(
+                    () -> new RuntimeException("Articulo no encontrado")
+            );
+            art.setStock((int) (art.getStock() + detalle.getCantidad()));
+        });
+        if (nota.getComprobante() != null) {
+            ComprobanteModel comp = nota.getComprobante();
+            comp.setEstado("Anulado");
+            comprobanteRepository.save(comp);
+        }
+
+        return notasRepository.save(nota);
     }
 }

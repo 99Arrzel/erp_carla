@@ -61,7 +61,7 @@ export class CuentasComponent {
       });
 
   }
-
+  updated?: boolean = false;
   updateCuentas() {
     let id_empresa = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
     console.log(id_empresa);
@@ -77,14 +77,14 @@ export class CuentasComponent {
         console.log(result, "la data nodos");
 
         this.files = [{ expanded: true, label: '0', data: { nombre: 'Plan de Cuentas', codigo: '-', tipo: '-', nivel: '-' }, children: TreeMaker(result) }];
-        console.log(TreeMaker(result), "la data nodos");
+        this.updated = true;
       }
     });
   }
 
   ngOnInit(): void {
     this.updateCuentas();
-  }
+  };
   openDialogCrear() {
     let id_empresa = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
     console.log(this.selectedNode, "xd");
@@ -110,7 +110,7 @@ export class CuentasComponent {
     );
   }
   openReportes() {
-    const baseUrlReporteGestion = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FZ&reportUnit=%2FZ%2Fcuenta_report&standAlone=true";
+    const baseUrlReporteGestion = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FCuentasReporte&standAlone=true";
     let id_empresa = this.route.parent?.snapshot.paramMap.get('id');
     abrirReporte({
       baseUrlReporte: baseUrlReporteGestion,
@@ -182,12 +182,14 @@ export function TreeMaker(values: Value[], parentId: string | null = null): Data
     const children = TreeMaker(values, value.id);
     return {
       key: value.id, // Add the required 'key' property here
+      expanded: true,
       label: value.id,
       data: value,
       ...(children.length > 0 && { children })
     };
   });
 }
+
 
 
 

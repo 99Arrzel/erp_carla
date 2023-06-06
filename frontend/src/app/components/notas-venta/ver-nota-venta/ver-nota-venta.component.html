@@ -1,1 +1,88 @@
-<p>ver-nota-venta works!</p>
+<div class="m-4">
+  <h1 class="font-bold">Detalles de nota de venta</h1>
+
+  <div class="flex  gap-2">
+    <div>
+      <mat-form-field class="w-40" appearance="fill">
+        <mat-label>Nro</mat-label>
+        <input matInput [value]="nota?.nro_nota" [disabled]="true">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="w-80" appearance="fill">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="pickerFecha" [value]="nota?.fecha" [disabled]="true">
+        <mat-datepicker-toggle matSuffix [for]="pickerFecha"></mat-datepicker-toggle>
+        <mat-datepicker #pickerFecha></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <!-- Descripcion -->
+    <div>
+      <mat-form-field class="w-80" appearance="fill">
+        <mat-label>Descripción</mat-label>
+        <input matInput [value]="nota?.descripcion" [disabled]=" true">
+      </mat-form-field>
+    </div>
+    <!-- Boton -->
+    <div>
+      <button mat-raised-button color="warn" [disabled]="nota?.estado == 'ANULADO'"
+        (click)="anularNota()">Anular</button>
+    </div>
+    <!-- Terciary button go back -->
+    <div>
+      <button mat-raised-button color="basic" (click)="goBack()">Volver</button>
+    </div>
+  </div>
+
+  <p-table [value]="nota?.detalles">
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th>
+          Articulo
+        </th>
+        <th>
+          Lote
+        </th>
+        <th>
+          Cantidad
+        </th>
+        <th>
+          Precio
+        </th>
+        <th>
+          Subtotal
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-lote>
+      <tr [pSelectableRow]="lote">
+        <td>{{lote.nombre_articulo}}</td>
+        <td>{{ lote.lote }}</td>
+        <td style="text-align:right">{{lote.cantidad}}</td>
+        <td style="text-align:right">{{lote.precio}}</td>
+        <!-- 2 formas de lo mismo -->
+        <td>
+          <div class="text-right
+          ">
+            {{lote.subtotal}}
+          </div>
+
+        </td>
+      </tr>
+    </ng-template>
+    <!-- Add foot with total -->
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="4" style="text-align:right">Total</td>
+        <td>
+          <div class="text-right
+                  ">
+            {{nota?.total}}
+          </div>
+        </td>
+
+
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

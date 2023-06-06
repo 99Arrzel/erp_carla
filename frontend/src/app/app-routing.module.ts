@@ -36,6 +36,7 @@ export function abrirReporte({ baseUrlReporte, parameters }: { baseUrlReporte: s
   }).then((data) => {
     const url = getReport({
       parameters: {
+        token: "Bearer " + localStorage.getItem("token") as string,
         "IdUsuario": data.id as string, //Fix reporte
         "idUsuario": data.id as string,
         sessionDecorator: "no",

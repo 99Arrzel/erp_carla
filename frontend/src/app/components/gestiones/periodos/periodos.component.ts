@@ -79,7 +79,7 @@ export class PeriodosComponent {
     );
   }
   openReportes() {
-    const baseUrlReportePeriodo = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FZ&reportUnit=%2FZ%2Fperiodo_report&standAlone=true";
+    const baseUrlReportePeriodo = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReportePeriodos&standAlone=true";
     const empresa_id = this.route.parent?.snapshot.paramMap.get('id');
     abrirReporte({
       baseUrlReporte: baseUrlReportePeriodo,

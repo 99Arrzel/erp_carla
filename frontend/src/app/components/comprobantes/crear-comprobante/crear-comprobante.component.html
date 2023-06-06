@@ -82,7 +82,7 @@
           <mat-form-field appearance="fill">
             <mat-label>Cuenta</mat-label>
             <mat-select formControlName="cuenta">
-              <mat-option *ngFor="let cuenta of cuentas" [value]="cuenta">
+              <mat-option *ngFor="let cuenta of cuentas" [value]="cuenta" [disabled]="isInTable(cuenta.id)">
                 {{ cuenta.nombre }}
               </mat-option>
             </mat-select>

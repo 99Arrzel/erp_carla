@@ -77,8 +77,8 @@ export class CategoriasComponent {
   }
   openDialogDelete() {
     Notiflix.Confirm.show(
-      'Eliminar Cuenta',
-      '¿Está seguro que desea eliminar la cuenta?',
+      'Eliminar Categoria',
+      '¿Está seguro que desea eliminar la categoria?',
       'Si',
       'No',
       () => {

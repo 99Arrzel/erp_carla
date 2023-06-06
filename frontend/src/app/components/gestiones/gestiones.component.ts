@@ -47,7 +47,8 @@ export class GestionesComponent {
   selectedGestion: Gestiones | undefined;
 
   openReportes() {
-    const baseUrlReporteGestion = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FZ&reportUnit=%2FZ%2Fgestion_report&standAlone=true";
+    const baseUrlReporteGestion = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteGestiones&standAlone=true";
+    
     abrirReporte({
       baseUrlReporte: baseUrlReporteGestion,
       parameters: {

@@ -53,6 +53,9 @@ import { CrearNotaVentaComponent } from './components/notas-venta/crear-nota-ven
 import { CalendarModule } from 'primeng/calendar';
 import { VerNotaCompraComponent } from './components/notas-compra/ver-nota-compra/ver-nota-compra.component';
 import { VerNotaVentaComponent } from './components/notas-venta/ver-nota-venta/ver-nota-venta.component';
+import { TabViewModule } from 'primeng/tabview';
+
+
 export function handleUnauthorizedError(e: HttpErrorResponse) {
   if (e.status == 401) {
     localStorage.removeItem("token");
@@ -104,6 +107,7 @@ export function handleMsgError(e: HttpErrorResponse) {
 
   ],
   imports: [
+    TabViewModule,
     AppRoutingModule,
     BrowserModule,
     BrowserAnimationsModule,

@@ -167,6 +167,16 @@ export class CrearComprobanteComponent {
   cambiosMonedas: any[] = [];
   min_tc = 0;
   max_tc = 0;
+  isInTable = (id_cuenta: any) => {
+    //this comprobantes detalles
+    const detalles = this.comprobante.value.detalles ?? [];
+    const detalle = detalles.find((d: any) => d.cuenta_id == id_cuenta);
+    if (detalle) {
+
+      return true;
+    }
+    return false;
+  };
   ngOnInit() {
 
 

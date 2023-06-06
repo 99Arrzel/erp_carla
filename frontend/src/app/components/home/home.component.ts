@@ -103,7 +103,7 @@ export class HomeComponent {
     });
   };
   openReportes() {
-    const baseUrlEmpresas = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FZ&reportUnit=%2FZ%2Fempresa_report&standAlone=true";
+    const baseUrlEmpresas = "http://localhost:8080/jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FZ&reportUnit=%2FZ%2Fempresa_report&standAlone=true&IdUsuario=1&idUsuario=1&sessionDecorator=no&chrome=false&decorate=no&toolbar=false&j_username=jasperadmin&j_password=bitnami";
     abrirReporte({
       baseUrlReporte: baseUrlEmpresas,
       parameters: {}

@@ -22,6 +22,16 @@ export class MonedasComponent {
   monedas: Moneda[] = [];
   http = inject(HttpClient);
   moneda_alternativa: any | null = null;
+
+  /* Si es que ya hay más de 1 registro de historial de cambios (cambios) settear la moneda alternative como únicamente lo último*/
+  setMonedaAlternativa() {
+    if (this.cambios.length > 0) {
+      const ultimo = this.cambios[0];
+
+
+    }
+  }
+
   fetchEmpresaMonedas(id: number) {
     this.http.post<EmpresaMonedaModel[]>(`${hostUrl}/api/moneda_empresa/por_empresa`, {
       id: id

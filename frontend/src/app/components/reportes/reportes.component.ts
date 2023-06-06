@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Moneda } from '../home/dialog-empresa/dialog-empresa.component';
 import { Notify } from 'notiflix';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-reportes',
@@ -19,6 +20,22 @@ export class ReportesComponent {
   http = inject(HttpClient);
   reportes =
     ['Balance Inicial', 'Libro Diario', 'Libro Mayor', 'Sumas y Saldos'];
+
+  items: MenuItem[] = [
+    {
+      label: 'Balance Inicial',
+    }, {
+      label: 'Libro Diario',
+    }, {
+      label: 'Libro Mayor',
+    }
+    , {
+      label: 'Sumas y Saldos',
+    }
+  ];
+
+  activeItem: MenuItem = this.items[0];
+
 
   id_gestion_bi: number = 0;
   id_monedaa_bi: number = 0;
@@ -168,6 +185,29 @@ export class ReportesComponent {
   setActionMonedaSS = (moneda: any) => {
     this.id_moneda_ss = moneda.source.value.id;
   };
+  //Ahora ES
+  id_gestion_es = 0;
+  setActionGestionES = (gestion: any) => {
+    this.id_gestion_es = gestion.source.value.id;
+  };
+  id_moneda_es = 0;
+  setActionMonedaES = (moneda: any) => {
+    this.id_moneda_es = moneda.source.value.id;
+  };
+  verReporteES = () => {
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteSumasSaldo&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_moneda: this.id_moneda_es.toString(),
+        id_gestion: this.id_gestion_es.toString(),
+      }
+    });
+
+  }
+
+
+    ;
   verReporteSS = () => {
     const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteSumasSaldo&standAlone=true";
     abrirReporte({
@@ -237,7 +277,8 @@ export class ReportesComponent {
     /* Fetch gestiones */
     this.fetchMonedas();
     this.updateGestiones();
-
+    console.log(this.items[0]);
+    console.log(this.activeItem);
   };
 
 };

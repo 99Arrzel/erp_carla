@@ -1,141 +1,184 @@
 <!-- Tabla de reportes, debe tener las columnas de "Nombre", Gestion, Periodo Moneda y si traer todo (que es un dropdown de si o no)"-->
-<p class="text-center text-2xl">Reportes</p>
+<div class="m-4">
+  <h1>Reportes</h1>
+  <p-tabView>
+    <!-- Dropdown -->
+    <p-tabPanel header="Balance Inicial">
+      <p>Balance Inicial</p>
+      <div class="flex gap-2">
+        <mat-form-field appearance="fill">
+          <mat-label>Gestion</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gestion of gestiones" [value]="gestion"
+              (onSelectionChange)="setActionGestionBI($event)">
+              {{ gestion?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- De monedas -->
+        <mat-form-field appearance="fill">
+          <mat-label>Monedas</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaBI($event)">
+              {{ moneda?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteBI()">
+          <mat-icon>visibility</mat-icon>
+        </button>
 
-<p>Balance Inicial</p>
-<!-- Dropdown -->
-<div class="flex gap-2">
-  <mat-form-field appearance="fill">
-    <mat-label>Gestion</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let gestion of gestiones" [value]="gestion" (onSelectionChange)="setActionGestionBI($event)">
-        {{ gestion?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <!-- De monedas -->
-  <mat-form-field appearance="fill">
-    <mat-label>Monedas</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaBI($event)">
-        {{ moneda?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Libro Diario">
+      <p>Libro Diario</p>
+      <!-- Libro diario -->
+      <div class="flex gap-2">
+        <mat-form-field appearance="fill">
+          <mat-label>Gestion</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gestion of gestiones" [value]="gestion"
+              (onSelectionChange)="setActionGestionLD($event)">
+              {{ gestion?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
+        <!-- Dropdown de los periodos de la gestion escogida previamente -->
+        <mat-form-field appearance="fill">
+          <mat-label>Periodo</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let periodo of periodosLD" [value]="periodo"
+              (onSelectionChange)="setActionPeriodoLD($event)">
+              {{ periodo?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- De monedas -->
+        <mat-form-field appearance="fill">
+          <mat-label>Monedas</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaLD($event)">
+              {{ moneda?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-  <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteBI()">
-    <mat-icon>visibility</mat-icon>
-  </button>
-</div>
-<p>Libro Diario</p>
-<!-- Libro diario -->
-<div class="flex gap-2">
-  <mat-form-field appearance="fill">
-    <mat-label>Gestion</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let gestion of gestiones" [value]="gestion" (onSelectionChange)="setActionGestionLD($event)">
-        {{ gestion?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+        <!-- Un dropdown de 2 valores, SI o NO -->
+        <mat-form-field appearance="fill">
+          <mat-label>Traer todo</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let todo of ['SI', 'NO']" [value]="todo" (onSelectionChange)="setActionTodoLD($event)">
+              {{ todo }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteLD()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Libro Mayor">
+      <p>Libro Mayor</p>
+      <!-- Libro diario -->
+      <div class="flex gap-2">
+        <mat-form-field appearance="fill">
+          <mat-label>Gestion</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gestion of gestiones" [value]="gestion"
+              (onSelectionChange)="setActionGestionLM($event)">
+              {{ gestion?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-  <!-- Dropdown de los periodos de la gestion escogida previamente -->
-  <mat-form-field appearance="fill">
-    <mat-label>Periodo</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let periodo of periodosLD" [value]="periodo" (onSelectionChange)="setActionPeriodoLD($event)">
-        {{ periodo?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <!-- De monedas -->
-  <mat-form-field appearance="fill">
-    <mat-label>Monedas</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaLD($event)">
-        {{ moneda?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+        <!-- Dropdown de los periodos de la gestion escogida previamente -->
+        <mat-form-field appearance="fill">
+          <mat-label>Periodo</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let periodo of periodosLM" [value]="periodo"
+              (onSelectionChange)="setActionPeriodoLM($event)">
+              {{ periodo?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- De monedas -->
+        <mat-form-field appearance="fill">
+          <mat-label>Monedas</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaLM($event)">
+              {{ moneda?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
-  <!-- Un dropdown de 2 valores, SI o NO -->
-  <mat-form-field appearance="fill">
-    <mat-label>Traer todo</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let todo of ['SI', 'NO']" [value]="todo" (onSelectionChange)="setActionTodoLD($event)">
-        {{ todo }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteLD()">
-    <mat-icon>visibility</mat-icon>
-  </button>
-</div>
-<p>Libro Mayor</p>
-<!-- Libro diario -->
-<div class="flex gap-2">
-  <mat-form-field appearance="fill">
-    <mat-label>Gestion</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let gestion of gestiones" [value]="gestion" (onSelectionChange)="setActionGestionLM($event)">
-        {{ gestion?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <!-- Dropdown de los periodos de la gestion escogida previamente -->
-  <mat-form-field appearance="fill">
-    <mat-label>Periodo</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let periodo of periodosLM" [value]="periodo" (onSelectionChange)="setActionPeriodoLM($event)">
-        {{ periodo?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <!-- De monedas -->
-  <mat-form-field appearance="fill">
-    <mat-label>Monedas</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaLM($event)">
-        {{ moneda?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <!-- Un dropdown de 2 valores, SI o NO -->
-  <mat-form-field appearance="fill">
-    <mat-label>Traer todo</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let todo of ['SI', 'NO']" [value]="todo" (onSelectionChange)="setActionTodoLM($event)">
-        {{ todo }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteLM()">
-    <mat-icon>visibility</mat-icon>
-  </button>
-</div>
-<p>Comprobación Sumas y Saldos</p>
-<!-- Dropdown -->
-<div class="flex gap-2">
-  <mat-form-field appearance="fill">
-    <mat-label>Gestion</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let gestion of gestiones" [value]="gestion" (onSelectionChange)="setActionGestionSS($event)">
-        {{ gestion?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <!-- De monedas -->
-  <mat-form-field appearance="fill">
-    <mat-label>Monedas</mat-label>
-    <mat-select>
-      <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaSS($event)">
-        {{ moneda?.nombre }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteSS()">
-    <mat-icon>visibility</mat-icon>
-  </button>
+        <!-- Un dropdown de 2 valores, SI o NO -->
+        <mat-form-field appearance="fill">
+          <mat-label>Traer todo</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let todo of ['SI', 'NO']" [value]="todo" (onSelectionChange)="setActionTodoLM($event)">
+              {{ todo }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteLM()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Sumas y Saldos">
+      <p>Comprobación Sumas y Saldos</p>
+      <!-- Dropdown -->
+      <div class="flex gap-2">
+        <mat-form-field appearance="fill">
+          <mat-label>Gestion</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gestion of gestiones" [value]="gestion"
+              (onSelectionChange)="setActionGestionSS($event)">
+              {{ gestion?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- De monedas -->
+        <mat-form-field appearance="fill">
+          <mat-label>Monedas</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaSS($event)">
+              {{ moneda?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteSS()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </p-tabPanel>
+    <p-tabPanel header="Estado de resultados">
+      <p>Estado de resultados</p>
+      <!-- Dropdown -->
+      <div class="flex gap-2">
+        <mat-form-field appearance="fill">
+          <mat-label>Gestion</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gestion of gestiones" [value]="gestion"
+              (onSelectionChange)="setActionGestionES($event)">
+              {{ gestion?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- De monedas -->
+        <mat-form-field appearance="fill">
+          <mat-label>Monedas</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaES($event)">
+              {{ moneda?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteES()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </p-tabPanel>
+  </p-tabView>
 </div>

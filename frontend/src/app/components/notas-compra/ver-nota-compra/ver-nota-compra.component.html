@@ -58,9 +58,30 @@
       <tr [pSelectableRow]="lote">
         <td>{{lote.articulo}}</td>
         <td>{{lote.fecha_vencimiento ? (lote.fecha_vencimiento | date:'dd/MM/yyyy') : "N/A"}}</td>
-        <td>{{lote.cantidad}}</td>
-        <td>{{lote.precio}}</td>
-        <td>{{lote.subtotal}}</td>
+        <td style="text-align:right">{{lote.cantidad}}</td>
+        <td style="text-align:right">{{lote.precio}}</td>
+        <!-- 2 formas de lo mismo -->
+        <td>
+          <div class="text-right
+          ">
+            {{lote.subtotal}}
+          </div>
+
+        </td>
+      </tr>
+    </ng-template>
+    <!-- Add foot with total -->
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="4" style="text-align:right">Total</td>
+        <td>
+          <div class="text-right
+                  ">
+            {{nota.total}}
+          </div>
+        </td>
+
+
       </tr>
     </ng-template>
   </p-table>
