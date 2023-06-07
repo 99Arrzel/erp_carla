@@ -195,7 +195,7 @@ export class ReportesComponent {
     this.id_moneda_es = moneda.source.value.id;
   };
   verReporteES = () => {
-    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteSumasSaldo&standAlone=true";
+    const url = "http://localhost:8080/jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteEstadoResultados&standAlone=true";
     abrirReporte({
       baseUrlReporte: url,
       parameters: {
