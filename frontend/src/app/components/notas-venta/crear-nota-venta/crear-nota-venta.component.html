@@ -1,5 +1,5 @@
 <div class="m-4">
-  <h1 class="font-bold">Crear nota de compra</h1>
+  <h1 class="font-bold">Crear nota de venta</h1>
 
   <div class="flex  gap-2" [formGroup]="notaCompra">
     <div>
@@ -31,25 +31,38 @@
 
   <div class="flex flex-wrap gap-2" [formGroup]="lotes">
     <!-- Ahora para los detalles, hay que poner un dropdown con articulos  -->
-    <mat-form-field class="w-80" appearance="fill">
-      <mat-label>Elige un articulo</mat-label>
+
+    <!-- <mat-label>Elige un articulo</mat-label>
       <mat-select formControlName="articulo">
         <mat-select-trigger>
           {{lotes.get('articulo')?.value?.nombre}}
         </mat-select-trigger>
-        <!-- Disabled if it has been selected -->
         <mat-option *ngFor="let articulo of articulos" [value]="articulo">{{articulo.nombre}}</mat-option>
-      </mat-select>
+      </mat-select> -->
+    <!-- Igual que en compras, filtrar -->
+    <mat-form-field class="w-80" appearance="fill">
+      <mat-label>Elige un articulo</mat-label>
+      <input type="text" placeholder="Elige un articulo" aria-label="Number" matInput [matAutocomplete]="auto"
+        formControlName="articulo">
+
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayArticulos">
+        <mat-option *ngFor="let articulo of articulosFiltrados | async" [disabled]="disabledIfIsInNotas(articulo.id)"
+          [value]="articulo">{{articulo.nombre}}</mat-option>
+      </mat-autocomplete>
     </mat-form-field>
+
+
+
     <mat-form-field class="w-80" appearance="fill">
       <mat-label>Elige un Lote</mat-label>
       <mat-select formControlName="lote">
         <mat-select-trigger>
-          {{"Lote:"+  lotes.get('lote')?.value?.nro_lote + " | Stock:" + lotes.get('lote')?.value?.cantidad + " | Vence:" + lotes.get('lote')?.value?.fecha_vencimiento}}
+          {{"Lote:"+  lotes.get('lote')?.value?.nro_lote + " | Stock:" + lotes.get('lote')?.value?.cantidad + " | Vence:" + (lotes.get('lote')?.value?.fecha_vencimiento == null ? "N/A" : lotes.get('lote')?.value?.fecha_vencimiento | date:'dd/MM/yyyy')}}
         </mat-select-trigger>
         <!-- Disabled if it has been selected -->
         <mat-option *ngFor="let articulo of lotes_articulo" [disabled]="disabledIfIsInNotas(articulo.id)"
-          [value]="articulo">{{"Lote:" +articulo.nro_lote + " | Stock:" + articulo.cantidad + " | Vence:" + articulo.fecha_vencimiento }}</mat-option>
+          [value]="articulo">{{"Lote:" +articulo.nro_lote + " | Stock:" + articulo.cantidad + " | Vence:" + (lotes.get('lote')?.value?.fecha_vencimiento == null ? "N/A" : lotes.get('lote')?.value?.fecha_vencimiento |
+          date:'dd/MM/yyyy') }}</mat-option>
       </mat-select>
     </mat-form-field>
     <!-- Input para fecha de vencimiento -->

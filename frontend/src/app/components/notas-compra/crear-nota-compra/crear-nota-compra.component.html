@@ -31,17 +31,29 @@
 
   <div class="flex flex-wrap gap-2" [formGroup]="lotes">
     <!-- Ahora para los detalles, hay que poner un dropdown con articulos  -->
-    <mat-form-field class="w-80" appearance="fill">
+    <!-- <mat-form-field class="w-80" appearance="fill">
       <mat-label>Elige un articulo</mat-label>
       <mat-select formControlName="articulo">
         <mat-select-trigger>
           {{lotes.get('articulo')?.value?.nombre}}
         </mat-select-trigger>
-        <!-- Disabled if it has been selected -->
+
         <mat-option *ngFor="let articulo of articulos" [disabled]="disabledIfIsInNotas(articulo.id)"
           [value]="articulo">{{articulo.nombre}}</mat-option>
       </mat-select>
+    </mat-form-field> -->
+    <!-- Reemplazar lo de arriba con el auto complete -->
+    <mat-form-field class="w-80" appearance="fill">
+      <mat-label>Elige un articulo</mat-label>
+      <input type="text" placeholder="Elige un articulo" aria-label="Number" matInput [matAutocomplete]="auto"
+        formControlName="articulo">
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayArticulos">
+        <mat-option *ngFor="let articulo of articulosFiltrados | async" [disabled]="disabledIfIsInNotas(articulo.id)"
+          [value]="articulo">{{articulo.nombre}}</mat-option>
+      </mat-autocomplete>
     </mat-form-field>
+
+
     <!-- Input para fecha de vencimiento -->
     <mat-form-field class="w-80" appearance="fill">
       <mat-label>F. de vencimiento</mat-label>
@@ -99,8 +111,15 @@
         <!-- Date to local date string, not only date -->
         <td>{{lote.fecha_vencimiento ? (lote.fecha_vencimiento | date:'dd/MM/yyyy') : "N/A"}}</td>
         <td>{{lote.cantidad}}</td>
-        <td>{{lote.precio}}</td>
-        <td>{{lote.subtotal}}</td>
+        <td style="text-align:right">{{lote.precio}}</td>
+        <td style="text-align:right">{{lote.subtotal}}</td>
+      </tr>
+    </ng-template>
+    <!-- Un footer con el total también -->
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="4" style="text-align:right">Total</td>
+        <td style="text-align:right">{{totalLotes()}}</td>
       </tr>
     </ng-template>
   </p-table>

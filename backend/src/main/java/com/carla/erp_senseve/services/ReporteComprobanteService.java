@@ -426,6 +426,15 @@ public class ReporteComprobanteService {
         reporteEstadoResultadosModel.setTotal_costos((float) estadoResultadosList1.stream().mapToDouble(EstadoResultado::getSaldo).sum());
         //Gastos es 5.2.?
         List<CuentaModel> cuentasGastos = cuentaService.obtenerCuentasPorEmpresaGastos(gestion.getEmpresa().getId());
+        //Log de cuentas gastos
+        System.out.println("Empresa");
+        System.out.println(gestion.getEmpresa().getNombre() + " - " + gestion.getEmpresa().getId());
+
+        System.out.println("Cuentas gastos");
+        cuentasGastos.forEach(cuentaModel -> {
+            System.out.println(cuentaModel.getCodigo() + " " + cuentaModel.getNombre());
+        });
+        System.out.println("Fin cuentas gastos");
         //Repetido lo de arriba
         List<EstadoResultado> estadoResultadosList2 = new ArrayList<>();
         cuentasGastos.forEach(cuentaModel -> {
@@ -453,7 +462,9 @@ public class ReporteComprobanteService {
         System.out.println(reporteEstadoResultadosModel.getUtilidad_operativa());
         System.out.println(reporteEstadoResultadosModel.getCostos());
         System.out.println(reporteEstadoResultadosModel.getGastos());
-        System.out.println(reporteEstadoResultadosModel.getIngresos());
+        reporteEstadoResultadosModel.getIngresos().forEach(estadoResultado -> {
+            System.out.println(estadoResultado.getNombre_cuenta() + " " + estadoResultado.getSaldo());
+        });
         return reporteEstadoResultadosModel;
     }
 }

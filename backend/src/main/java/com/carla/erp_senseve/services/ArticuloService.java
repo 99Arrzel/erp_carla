@@ -2,6 +2,7 @@ package com.carla.erp_senseve.services;
 
 import com.carla.erp_senseve.models.ArticuloModel;
 import com.carla.erp_senseve.models.EmpresaModel;
+import com.carla.erp_senseve.models.LotesModel;
 import com.carla.erp_senseve.models.UsuarioModel;
 import com.carla.erp_senseve.repositories.ArticuloRepository;
 import com.carla.erp_senseve.repositories.EmpresaRepository;
@@ -25,7 +26,8 @@ public class ArticuloService {
     ArticuloRepository articuloRepository;
     @Autowired
     EmpresaRepository empresaRepository;
-    public ArticuloModel crear(String nombre, String descripcion, Float precio, List<Long> categorias, Long idEmpresa,String authHeader) {
+
+    public ArticuloModel crear(String nombre, String descripcion, Float precio, List<Long> categorias, Long idEmpresa, String authHeader) {
         UsuarioModel usuario = usuarioRepository.findByUsuario(tokenGetUserService.username(authHeader)).orElseThrow(
                 () -> new RuntimeException("El usuario no existe")
         );
@@ -33,7 +35,7 @@ public class ArticuloService {
                 () -> new RuntimeException("La empresa no existe")
         );
         //Verificar que le pertenezca
-        if(!empresa.getUsuario().getId().equals(usuario.getId())){
+        if (!empresa.getUsuario().getId().equals(usuario.getId())) {
             throw new RuntimeException("La empresa no le pertenece");
         }
         ArticuloModel articuloModel = new ArticuloModel();
@@ -46,13 +48,14 @@ public class ArticuloService {
         articuloRepository.save(articuloModel);
         return articuloModel;
     }
+
     public ArticuloModel editar(
             Long id,
             String nombre,
             String descripcion,
             Float precio,
             List<Long> categorias
-    ){
+    ) {
         ArticuloModel articuloModel = articuloRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("El articulo no existe")
         );
@@ -63,21 +66,38 @@ public class ArticuloService {
         articuloRepository.save(articuloModel);
         return articuloModel;
     }
-    public ArticuloModel eliminar(Long id){
+
+    public ArticuloModel eliminar(Long id) {
         ArticuloModel articuloModel = articuloRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("El articulo no existe")
         );
         articuloRepository.delete(articuloModel);
         return articuloModel;
     }
+
     public List<ArticuloModel> ListarDeUsuarioPorEmpresa(
             String authHeader,
             String empresa_id
-    ){
+    ) {
         UsuarioModel usuario = usuarioRepository.findByUsuario(tokenGetUserService.username(authHeader)).orElseThrow(
                 () -> new RuntimeException("El usuario no existe")
         );
-        return articuloRepository.findByIdAndUsuario( Long.parseLong(empresa_id), usuario.getId());
+        //Set null los lotes que tengan estado "ANULADO"
+        List<ArticuloModel> articuloModels = articuloRepository.findByIdAndUsuario(Long.parseLong(empresa_id), usuario.getId());
+        for (ArticuloModel articuloModel : articuloModels) {
+            //De la lista de artigulos, hay lotes, filtrame los lotes que tengan estado "ANULADO"
+            List<LotesModel> lotesModels = articuloModel.getLotes();
+            for (LotesModel lotesModel : lotesModels) {
+                if (lotesModel.getEstado().equals("ANULADO")) {
+                    System.out.println("Lote anulado");
+                    System.out.println(lotesModel.getEstado());
+                    lotesModel.setArticulo(null);
+                }
+            }
+            articuloModel.setLotes(lotesModels);
+        }
+
+        return articuloModels;
 
     }
 }

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Notify } from 'notiflix';
+import { Confirm, Notify } from 'notiflix';
 import { hostUrl } from 'src/app/app-routing.module';
 
 @Component({
@@ -17,24 +17,30 @@ export class VerNotaCompraComponent {
   http = inject(HttpClient);
 
   anularNota() {
-    this.http.post(`${hostUrl}/api/notas/anular_compra`, {
-      nota_id: this.id_nota
-    },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
-        }
-      }).subscribe({
-        next: (data: any) => {
-          this.router.navigate(["empresa/" + this.route.parent?.snapshot.paramMap.get('id') + "/notas_compra"]);
-          Notify.success("Nota anulada");
-        },
-        error: (error: any) => {
-          console.log(error);
-          Notify.failure(error.error);
-        }
+    //Notiflix de confirmación
+    Confirm.show('¿Está seguro que desea anular la nota de compra?', 'Anular nota de compra', 'Si', 'No', () => {
+      this.http.post(`${hostUrl}/api/notas/anular_compra`, {
+        nota_id: this.id_nota
+      },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        }).subscribe({
+          next: (data: any) => {
+            this.router.navigate(["empresa/" + this.route.parent?.snapshot.paramMap.get('id') + "/notas_compra"]);
+            Notify.success("Nota anulada");
+          },
+          error: (error: any) => {
+            console.log(error);
+            Notify.failure(error.error);
+          }
 
-      });
+        });
+    }, () => {
+      Notify.failure('No se anuló la nota de compra');
+    }
+    );
 
   }
   goBack() {

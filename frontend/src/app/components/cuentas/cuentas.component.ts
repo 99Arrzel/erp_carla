@@ -200,6 +200,7 @@ export function TreeMakerGeneric<T extends { [key: string]: any; }>(values: T[],
     return {
       label: value['id'],// Add the required 'label' property here
       key: value['id'],
+      expanded: true,
       data: value,
       ...(children.length > 0 && { children })
     };

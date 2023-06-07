@@ -1,4 +1,4 @@
-import { lastValueFrom } from 'rxjs';
+import { Observable, lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Notify } from 'notiflix';
 import { EmpresaMonedaModel } from '../../home/home.component';
-
+import { map, startWith } from 'rxjs/operators';
 type DetalleComprobante = {
   glosa: string;
   cuenta_id: number;
@@ -38,6 +38,8 @@ export class CrearComprobanteComponent {
   debeDisabled = false;
   haberDisabled = false;
 
+
+
   disableTC = false;
   comprobante = new FormGroup({
     glosa: new FormControl('', [Validators.required]),
@@ -50,7 +52,7 @@ export class CrearComprobanteComponent {
   });
   detalle = new FormGroup({
     glosa: new FormControl('', [Validators.required]),
-    cuenta: new FormControl(null as any, [Validators.required]),
+    cuenta: new FormControl({} as any, [Validators.required]),
     debe: new FormControl({ value: 0, disabled: false }),
     haber: new FormControl({ value: 0, disabled: false }),
   });
@@ -177,14 +179,47 @@ export class CrearComprobanteComponent {
     }
     return false;
   };
+  cuentasFiltradas: Observable<any[]> | undefined;
+  private _filter(value: any): any[] {
+    //si es un string, o sea si es l primera vez
+    if (typeof value === 'string') {
+      const filterValue = value.toLowerCase();
+      return this.cuentas.filter(option => {
+        console.log(option, "La option");
+        return option.nombre.toLowerCase().includes(filterValue);
+      });
+    }
+    //si es un objeto, o sea si ya se selecciono una cuenta
+    const filterValue = value.nombre.toLowerCase();
+    return this.cuentas.filter(option => {
+      return option.nombre.toLowerCase().includes(filterValue);
+    });
+  }
+  displayCuentas = (cuenta: any) => {
+    if (cuenta) {
+      return cuenta.nombre;
+    }
+    return '';
+  };
+
+  rojitoSeleccionado = () => {
+    if (this.selectedDetalle) {
+      return "bg-red-500";
+    }
+    return "bg-gray-600";
+  };
+
+  selectedDetalle: any = null;
+  eliminarDetalle = () => {
+    //filtramos detlales, el selecteDetalle
+    const detalles = this.comprobante.value.detalles ?? [];
+    const detallesFiltrados = detalles.filter((d: any) => d.cuenta_id != this.selectedDetalle.cuenta_id);
+    this.comprobante.patchValue({ detalles: detallesFiltrados });
+  };
   ngOnInit() {
-
-
-
-
-
-
-
+    this.cuentasFiltradas = this.detalle.get('cuenta')?.valueChanges.pipe(
+      map(value => this._filter(value || ''))
+    );
     this.comprobante.valueChanges.subscribe((v) => {
       console.log(v);
       if (v.tc as number < this.min_tc || v.tc as number > this.max_tc) {

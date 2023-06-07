@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Notify } from 'notiflix';
+import { Observable, map } from 'rxjs';
 import { hostUrl } from 'src/app/app-routing.module';
 
 
@@ -156,9 +157,30 @@ export class CrearNotaVentaComponent {
   total = () => {
     return this.notaCompra.value.lotes.reduce((a: any, b: any) => a + b.subtotal, 0);
   };
-
-
+  articulosFiltrados: Observable<any> | undefined;
+  private _filter(value: any): any[] {
+    //si es un string, o sea si es l primera vez
+    if (typeof value === 'string') {
+      const filterValue = value.toLowerCase();
+      return this.articulos.filter((option: any) => {
+        console.log(option, "La option");
+        return option.nombre.toLowerCase().includes(filterValue);
+      });
+    }
+    //si es un objeto, o sea si ya se selecciono una cuenta
+    const filterValue = value.nombre.toLowerCase();
+    return this.articulos.filter((option: any) => {
+      return option.nombre.toLowerCase().includes(filterValue);
+    });
+  }
+  displayArticulos = (articulo: any) => {
+    if (articulo == null) return "";
+    return articulo.nombre;
+  };
   ngOnInit(): void {
+    this.articulosFiltrados = this.lotes.get('articulo')?.valueChanges.pipe(
+      map(value => this._filter(value || ''))
+    );
 
     this.http.post(`${hostUrl}/api/notas/ultimo_numero`, {
       empresa_id: this.id_empresa,
@@ -181,16 +203,30 @@ export class CrearNotaVentaComponent {
       }, { emitEvent: false });
       if (v.articulo != null) {
         this.lotes_articulo = v.articulo.lotes.filter((l: any) => l.stock > 0);
-
         //Filtrar lote también cuando esté agregado
         console.log(this.lotes_articulo, "lotes articulo");
+
+        //Seleccionar el lote más antiguo
+        if (this.lotes_articulo.length > 0) {
+          this.lotes.patchValue({
+            lote: this.lotes_articulo[0]
+          }, { emitEvent: false });
+        }
       }
-      if (v.lote != null) {
+      console.log(v, "La cosa a updatear");
+      /* if (v.lote != null) {
         //Setear precio
+
         this.lotes.patchValue({
           precio: v.lote.precio_compra
         }, { emitEvent: false });
+       }*/
+      if (v.articulo?.precio) {
+        this.lotes.patchValue({
+          precio: v.articulo.precio
+        }, { emitEvent: false });
       }
+
     });
 
     this.fetchArticulos();

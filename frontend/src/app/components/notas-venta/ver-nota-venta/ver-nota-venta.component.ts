@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Notify } from 'notiflix';
+import { Confirm, Notify } from 'notiflix';
 import { hostUrl } from 'src/app/app-routing.module';
 
 @Component({
@@ -18,25 +18,32 @@ export class VerNotaVentaComponent {
   http = inject(HttpClient);
 
   anularNota() {
-    this.http.post(`${hostUrl}/api/notas/anular_venta`, {
-      nota_id: this.nota.id,
-    },
-      {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
-        }
-      }).subscribe({
-        next: (data: any) => {
-          this.nota = data;
-          Notify.success("Nota anulada");
-          this.fetchNota();
-          console.log(data);
-        },
-        error: (error: any) => {
-          Notify.failure("Error al anular nota");
-          console.log(error);
-        }
-      });
+    //Notiflix de confirmación
+    Confirm.show('¿Está seguro que desea anular la nota de venta?', 'Anular nota de venta', 'Si', 'No', () => {
+      this.http.post(`${hostUrl}/api/notas/anular_venta`, {
+        nota_id: this.nota.id,
+      },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token")
+          }
+        }).subscribe({
+          next: (data: any) => {
+            this.nota = data;
+            Notify.success("Nota anulada");
+            this.fetchNota();
+            console.log(data);
+          },
+          error: (error: any) => {
+            Notify.failure("Error al anular nota");
+            console.log(error);
+          }
+        });
+    }, () => {
+      Notify.failure('No se anuló la nota de venta');
+    }
+    );
+
 
   }
   goBack() {

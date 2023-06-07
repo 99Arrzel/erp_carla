@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Notify } from 'notiflix';
+import { Observable, map } from 'rxjs';
 import { hostUrl } from 'src/app/app-routing.module';
 
 @Component({
@@ -39,7 +40,14 @@ export class CrearNotaCompraComponent {
   isDisabled = (id: number) => {
     return false;
   };
-
+  totalLotes() {
+    //notaCompra lotes
+    let total = 0;
+    for (const lote of this.notaCompra.value.lotes) {
+      total += lote.subtotal;
+    }
+    return total;
+  }
   addLote() {
 
     if (this.lotes.value.articulo == null) {
@@ -64,6 +72,27 @@ export class CrearNotaCompraComponent {
     this.lotes.reset();
     this.selectedLote = null;
   }
+  articulosFiltrados: Observable<any[]> | undefined;
+
+  private _filter(value: any): any[] {
+    //si es un string, o sea si es l primera vez
+    if (typeof value === 'string') {
+      const filterValue = value.toLowerCase();
+      return this.articulos.filter((option: any) => {
+        console.log(option, "La option");
+        return option.nombre.toLowerCase().includes(filterValue);
+      });
+    }
+    //si es un objeto, o sea si ya se selecciono una cuenta
+    const filterValue = value.nombre.toLowerCase();
+    return this.articulos.filter((option: any) => {
+      return option.nombre.toLowerCase().includes(filterValue);
+    });
+  }
+  displayArticulos = (articulo: any) => {
+    if (articulo == null) return "";
+    return articulo.nombre;
+  };
 
   crearNota() {
 
@@ -141,6 +170,12 @@ export class CrearNotaCompraComponent {
   };
   cambioProgramatico = false;
   ngOnInit(): void {
+    this.articulosFiltrados = this.lotes.get('articulo')?.valueChanges.pipe(
+      map(value => this._filter(value || ''))
+    );
+
+
+
     this.http.post(`${hostUrl}/api/notas/ultimo_numero`, {
       empresa_id: this.id_empresa,
       tipo: 'COMPRA'

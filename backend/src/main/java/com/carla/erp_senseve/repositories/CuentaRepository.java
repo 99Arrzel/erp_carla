@@ -53,13 +53,13 @@ public interface CuentaRepository extends JpaRepository<CuentaModel, Long> {
     );
 
     //Lo mismo que arriba, pero con 5.1.?
-    @Query(value = "SELECT * FROM cuentas WHERE empresa_id = ?1 AND codigo LIKE '5.1.%' AND tipo = 'Detalle' ORDER BY inet_truchon(codigo)", nativeQuery = true)
+    @Query(value = "SELECT * FROM cuentas WHERE empresa_id = ?1 AND codigo LIKE '5.1%' AND tipo = 'Detalle' ORDER BY inet_truchon(codigo)", nativeQuery = true)
     List<CuentaModel> findByEmpresaIdAndCostos(
             @Param("empresa_id") Long empresa_id
     );
 
     //Lo mismo que arriba pero con 5.2.?
-    @Query(value = "SELECT * FROM cuentas WHERE empresa_id = ?1 AND codigo LIKE '5.2.%' AND tipo = 'Detalle' ORDER BY inet_truchon(codigo)", nativeQuery = true)
+    @Query(value = "SELECT * FROM cuentas WHERE empresa_id = ?1 AND codigo LIKE '5.2%' AND tipo = 'Detalle' ORDER BY inet_truchon(codigo)", nativeQuery = true)
     List<CuentaModel> findByEmpresaIdAndGastos(
             @Param("empresa_id") Long empresa_id
     );

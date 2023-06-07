@@ -22,15 +22,6 @@
         </mat-form-field>
       </div>
       <div>
-        <!-- <mat-form-field appearance="fill">
-          <mat-label>Moneda</mat-label>
-          <mat-select formControlName="moneda">
-            <mat-option *ngFor="let moneda of monedas" [value]="moneda">
-              {{ moneda.nombre }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field> -->
-        <!-- Esto pero DISABLED -->
         <mat-form-field appearance="fill">
           <mat-label>Moneda</mat-label>
           <mat-select formControlName="moneda" [disabled]="true">
@@ -39,6 +30,7 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+
       </div>
       <div>
         <mat-form-field appearance="fill">
@@ -74,18 +66,28 @@
         </div>
         <div>
 
+
           <!-- <mat-form-field appearance="fill">
-            <mat-label>Cuenta</mat-label>
-            <input matInput placeholder="Cuenta" formControlName="cuenta">
-          /mat-form-field> -->
-          <!-- Esto debe ser un select de cuentas-->
-          <mat-form-field appearance="fill">
             <mat-label>Cuenta</mat-label>
             <mat-select formControlName="cuenta">
               <mat-option *ngFor="let cuenta of cuentas" [value]="cuenta" [disabled]="isInTable(cuenta.id)">
                 {{ cuenta.nombre }}
               </mat-option>
             </mat-select>
+          </mat-form-field> -->
+          <!-- Lo mismo pero con mat autocomplete -->
+          <mat-form-field appearance="fill">
+            <mat-label>Cuenta</mat-label>
+            <input type="text" placeholder="Cuenta" aria-label="Number" matInput [matAutocomplete]="auto"
+              formControlName="cuenta"
+              
+              >
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCuentas">
+              <mat-option *ngFor="let cuenta of cuentasFiltradas | async" [value]="cuenta"
+                [disabled]="isInTable(cuenta.id)">
+                {{ cuenta.nombre }}
+              </mat-option>
+            </mat-autocomplete>
           </mat-form-field>
         </div>
         <div>
@@ -102,15 +104,22 @@
         </div>
         <div class="col-span-2   bg-gray-600 ">
           <button type="button" class="p-4" (click)="agregarDetalle()">
-            +
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+        <div [class]="rojitoSeleccionado() + ' col-span-2 '">
+          <button type="button" class="p-4" (click)="eliminarDetalle()">
+            <!-- Math icon - -->
+            <mat-icon>remove</mat-icon>
           </button>
         </div>
       </div>
     </form>
   </div>
   <!-- Finalmente una tabla con los detalles -->
+  <!-- Añadir selección -->
   <p-table [value]="comprobante.value.detalles ?? []" [paginator]="true" [rows]="10" [responsive]="true"
-    [columns]="['Glosa', 'Cuenta', 'Debe', 'Haber']">
+    selectionMode="single" [(selection)]="selectedDetalle" [columns]="['Glosa', 'Cuenta', 'Debe', 'Haber']">
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th *ngFor="let col of ['Glosa', 'Cuenta', 'Debe', 'Haber']">
@@ -119,7 +128,7 @@
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-detalle>
-      <tr>
+      <tr [pSelectableRow]="detalle">
         <td>{{detalle.glosa}}</td>
         <td>{{detalle.cuenta.nombre}}</td>
         <td>{{detalle.debe}}</td>
