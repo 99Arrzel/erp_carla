@@ -8,6 +8,10 @@
     <button mat-icon-button color="primary" matTooltip="Ver detalles de la nota" type="button" (click)="verNota()">
       <mat-icon>visibility</mat-icon>
     </button>
+    <button mat-icon-button color="primary" matTooltip="Ver reporte de la nota de compra" type="button"
+      (click)="reporteNota()">
+      <mat-icon>description</mat-icon>
+    </button>
   </div>
   <p-table [value]="notas" selectionMode="single" [(selection)]="selectedNota">
 
@@ -30,7 +34,7 @@
     <ng-template pTemplate="body" let-nota>
       <tr [pSelectableRow]="nota">
         <td>{{nota.nro_nota}}</td>
-        <td>{{nota.fecha}}</td>
+        <td>{{nota.fecha | date: 'dd/MM/yyyy'}}</td>
         <td>{{nota.descripcion}}</td>
         <td>{{nota.estado}}</td>
       </tr>

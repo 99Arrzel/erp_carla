@@ -1,7 +1,51 @@
 <div class="bg-gray-500 p-10">
   <h2 class="text-center">Detalles del comprobante </h2>
+  <div>
+    <!-- Inputs de serie, glosa, tipo de cambio, moneda, tipo y fecha -->
+    <div class="gap-2  flex flex-wrap justify-center">
+      <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Serie</mat-label>
+          <input matInput placeholder="Serie" [value]="comprobante?.serie" disabled="true">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Glosa</mat-label>
+          <input matInput placeholder="Glosa" [value]="comprobante?.glosa" [disabled]="true">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Tipo de cambio</mat-label>
+          <input type="number" [value]="comprobante?.tc" matInput placeholder="Tipo de cambio" disabled="true">
+        </mat-form-field>
+      </div>
+      <div>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Moneda</mat-label>
+          <input disabled="true" matInput placeholder="Tipo de cambio" [value]="comprobante?.moneda_nombre">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Tipo</mat-label>
+
+          <input disabled="true" [value]="comprobante?.tipo" matInput placeholder="Tipo de cambio">
+        </mat-form-field>
+      </div>
+      <div>
+        <mat-form-field appearance="fill">
+          <mat-label>Fecha</mat-label>
+          <input matInput disabled="true" [value]="comprobante?.fecha | date: 'dd/MM/yyyy'" placeholder="Fecha">
+
+        </mat-form-field>
+      </div>
+    </div>
+  </div>
   <!-- Tabla con numero, glosa, monto debe y monto haber, ademas de monto_debe_alt y monto_haber_alt  -->
-  <p-table [value]="detallesComprobante" [columns]="cols"  >
+  <p-table [value]="detallesComprobante" [columns]="cols" [scrollable]="true" [scrollHeight]="'300px'">
     <ng-template pTemplate="header" let-columns>
       <tr>
         <th *ngFor="let col of columns">
@@ -13,10 +57,17 @@
       <tr [pSelectableRow]="detalleComprobante">
         <td>{{detalleComprobante.numero}}</td>
         <td>{{detalleComprobante.glosa}}</td>
-        <td>{{detalleComprobante.monto_debe}}</td>
-        <td>{{detalleComprobante.monto_haber}}</td>
-        <td>{{detalleComprobante.monto_debe_alt}}</td>
-        <td>{{detalleComprobante.monto_haber_alt}}</td>
+        <td style="text-align: right">{{detalleComprobante.monto_debe}}</td>
+        <td style="text-align: right">{{detalleComprobante.monto_haber}}</td>
+      </tr>
+    </ng-template>
+    <!-- Footer suma moto debe y haber -->
+    <ng-template pTemplate="footer" let-columns>
+      <tr>
+        <td></td>
+        <td>Total:</td>
+        <td style="text-align: right;">{{sumarDebe()}}</td>
+        <td style="text-align: right">{{sumarHaber()}}</td>
       </tr>
     </ng-template>
   </p-table>

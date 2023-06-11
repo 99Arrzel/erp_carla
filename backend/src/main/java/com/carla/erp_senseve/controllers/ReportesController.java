@@ -1,6 +1,7 @@
 package com.carla.erp_senseve.controllers;
 
 import com.carla.erp_senseve.models.*;
+import com.carla.erp_senseve.services.NotasService;
 import com.carla.erp_senseve.services.ReporteComprobanteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,6 +15,8 @@ import java.util.Map;
 public class ReportesController {
     @Autowired
     ReporteComprobanteService reporteComprobanteService;
+    @Autowired
+    NotasService notasService;
 
     @PostMapping(value = "/reporte_comprobante", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<?> reporte_comprobante(
@@ -26,6 +29,39 @@ public class ReportesController {
             return ResponseEntity.ok().body(reporteComprobanteModel);
         } catch (Exception e) {
             System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
+
+    //@PostMapping(value = "/reporte_comprobante", consumes = MediaType.ALL_VALUE)
+    @PostMapping(value = "/una_nota_compra_reporte", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> una_nota_compra_reporte(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam Map<String, String> data
+    ) {
+        try {
+            return ResponseEntity.ok().body(
+                    notasService.una_nota_compra(
+                            data.get("nota_id")
+                    )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
+
+    @PostMapping(value = "/una_nota_venta_reporte", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> una_nota_venta_reporte(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam Map<String, String> data
+    ) {
+        try {
+            return ResponseEntity.ok().body(
+                    notasService.una_nota_venta(
+                            data.get("nota_id")
+                    )
+            );
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage().toString());
         }
     }

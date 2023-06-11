@@ -13,11 +13,26 @@ import { hostUrl } from 'src/app/app-routing.module';
 })
 export class DialogDetallesComprobanteComponent {
 
-  cols = ['Numero', 'Glosa', 'Monto Debe', 'Monto Haber', 'Monto Debe Alt.', 'Monto Haber Alt.'];
+  cols = ['Cuenta', 'Glosa', 'Monto Debe', 'Monto Haber',];
   detallesComprobante: any[] = [];
-
+  sumarDebe() {
+    let total = 0;
+    this.detallesComprobante.forEach((detalle: any) => {
+      total += detalle.monto_debe;
+    });
+    return total;
+  }
+  sumarHaber() {
+    let total = 0;
+    this.detallesComprobante.forEach((detalle: any) => {
+      total += detalle.monto_haber;
+    });
+    return total;
+  }
+  comprobante: any = null;
   ngOnInit(): void {
     console.log(this.data.comprobante, "Datos del comp");
+    this.comprobante = this.data.comprobante;
     this.detallesComprobante = this.data.comprobante.detalles;
   }
   constructor(

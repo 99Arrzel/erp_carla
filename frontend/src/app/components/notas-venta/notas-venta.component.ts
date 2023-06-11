@@ -3,7 +3,8 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { hostUrl } from 'src/app/app-routing.module';
+import { Notify } from 'notiflix';
+import { abrirReporte, hostUrl } from 'src/app/app-routing.module';
 
 @Component({
   selector: 'app-notas-venta',
@@ -14,7 +15,22 @@ export class NotasVentaComponent {
   constructor(private router: Router, public dialog: MatDialog, private route: ActivatedRoute) { }
 
 
+  reporteNota() {
 
+    if (this.selectedNota == null) {
+      Notify.failure("Debe seleccionar una nota");
+      return;
+    }
+
+    const baseUrlReporteGestion = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FNotaVentaReport&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: baseUrlReporteGestion,
+      parameters: {
+        id_nota: this.selectedNota.id
+      }
+    });
+    Notify.success("Reporte abierto con éxito");
+  }
   verNota() {
     this.router.navigate(["empresa/" + this.empresa_id + "/notas_venta/ver/" + this.selectedNota.id]);
   }

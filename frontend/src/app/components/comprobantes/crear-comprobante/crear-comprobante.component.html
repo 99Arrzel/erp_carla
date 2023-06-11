@@ -18,14 +18,15 @@
       <div>
         <mat-form-field appearance="fill">
           <mat-label>Tipo de cambio</mat-label>
-          <input [min]="min_tc" [max]="max_tc" type="number" matInput placeholder="Tipo de cambio" formControlName="tc">
+          <input [min]="min_tc()" [max]="max_tc()" type="number" matInput placeholder="Tipo de cambio"
+            formControlName="tc">
         </mat-form-field>
       </div>
       <div>
         <mat-form-field appearance="fill">
           <mat-label>Moneda</mat-label>
           <mat-select formControlName="moneda" [disabled]="true">
-            <mat-option *ngFor="let moneda of monedas" [value]="moneda" [disabled]="true">
+            <mat-option *ngFor="let moneda of monedasActivas()" [value]="moneda">
               {{ moneda.nombre }}
             </mat-option>
           </mat-select>
@@ -58,12 +59,7 @@
     <!-- Detalles debe tener 4 cosas, glosaa, cuenta, debe, haber-->
     <form [formGroup]="detalle" class="mx-auto">
       <div class="flex  gap-4 flex-wrap  justify-center">
-        <div>
-          <mat-form-field appearance="fill">
-            <mat-label>Glosa</mat-label>
-            <input matInput placeholder="Glosa" formControlName="glosa">
-          </mat-form-field>
-        </div>
+
         <div>
 
 
@@ -79,15 +75,19 @@
           <mat-form-field appearance="fill">
             <mat-label>Cuenta</mat-label>
             <input type="text" placeholder="Cuenta" aria-label="Number" matInput [matAutocomplete]="auto"
-              formControlName="cuenta"
-              
-              >
+              formControlName="cuenta">
             <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayCuentas">
               <mat-option *ngFor="let cuenta of cuentasFiltradas | async" [value]="cuenta"
                 [disabled]="isInTable(cuenta.id)">
                 {{ cuenta.nombre }}
               </mat-option>
             </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-form-field appearance="fill">
+            <mat-label>Glosa</mat-label>
+            <input matInput placeholder="Glosa" formControlName="glosa">
           </mat-form-field>
         </div>
         <div>
@@ -107,12 +107,20 @@
             <mat-icon>add</mat-icon>
           </button>
         </div>
+        <div [class]="amarilloSeleccionado() + ' col-span-2 '">
+          <button type="button" class="p-4" (click)="editarDetalle()">
+            <!-- Math icon edit - -->
+            <mat-icon>edit</mat-icon>
+
+          </button>
+        </div>
         <div [class]="rojitoSeleccionado() + ' col-span-2 '">
           <button type="button" class="p-4" (click)="eliminarDetalle()">
             <!-- Math icon - -->
             <mat-icon>remove</mat-icon>
           </button>
         </div>
+
       </div>
     </form>
   </div>
@@ -122,17 +130,17 @@
     selectionMode="single" [(selection)]="selectedDetalle" [columns]="['Glosa', 'Cuenta', 'Debe', 'Haber']">
     <ng-template pTemplate="header" let-columns>
       <tr>
-        <th *ngFor="let col of ['Glosa', 'Cuenta', 'Debe', 'Haber']">
+        <th *ngFor="let col of ['Cuenta', 'Glosa', 'Debe', 'Haber']">
           {{col}}
         </th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-detalle>
       <tr [pSelectableRow]="detalle">
-        <td>{{detalle.glosa}}</td>
         <td>{{detalle.cuenta.nombre}}</td>
-        <td>{{detalle.debe}}</td>
-        <td>{{detalle.haber}}</td>
+        <td>{{detalle.glosa}}</td>
+        <td style="text-align: right">{{detalle.debe}}</td>
+        <td style="text-align: right">{{detalle.haber}}</td>
         <!-- <td>{{detalle.debe_alt}}</td>
         <td>{{detalle.haber_alt}}</td> -->
       </tr>
@@ -142,10 +150,8 @@
       <tr>
         <td></td>
         <td>Total:</td>
-        <td>{{sumarDebe()}}</td>
-        <td>{{sumarHaber()}}</td>
-
-
+        <td style="text-align: right">{{sumarDebe()}}</td>
+        <td style="text-align: right">{{sumarHaber()}}</td>
       </tr>
     </ng-template>
   </p-table>

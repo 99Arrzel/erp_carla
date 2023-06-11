@@ -40,8 +40,8 @@
     <tr [pSelectableRow]="car">
       <!-- <td>{{car.id}}</td> -->
       <td>{{car.nombre}}</td>
-      <td>{{car.fechaInicio}}</td>
-      <td>{{car.fechaFin}}</td>
+      <td>{{car.fechaInicio | date: 'dd/MM/yyyy'}}</td>
+      <td>{{car.fechaFin | date: 'dd/MM/yyyy'}}</td>
       <td>{{car.estado ? 'Activo' : 'Inactivo'}}</td>
     </tr>
   </ng-template>

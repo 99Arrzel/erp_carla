@@ -18,5 +18,7 @@ public class NotaVentaDTO {
     public List<NotaVentaDetallesDTO> detalles;
     public String estado;
     public Float total;
+    public String empresa;
+    public String usuario;
 
 }

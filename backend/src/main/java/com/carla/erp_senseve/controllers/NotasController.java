@@ -68,6 +68,7 @@ public class NotasController {
         }
     }
 
+
     //crear_venta
     @PostMapping(value = "/crear_venta")
     public ResponseEntity<?> crear_venta(
@@ -133,6 +134,7 @@ public class NotasController {
             return ResponseEntity.badRequest().body(e.getMessage().toString());
         }
     }
+
 
     @PostMapping(value = "/una_nota_venta")
     public ResponseEntity<?> una_nota_venta(

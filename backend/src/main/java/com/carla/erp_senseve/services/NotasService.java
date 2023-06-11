@@ -34,6 +34,11 @@ public class NotasService {
     LoteRepository lotesRepository;
     @Autowired
     Detallesrepository detallesRepository;
+    @Autowired
+    EmpresaMonedaRepository empresaMonedaRepository;
+
+    @Autowired
+    MonedaRepository monedaRepository;
 
     public List<NotaModel> listar(String empresaId, String tipo) {
         if (empresaId == null || empresaId.isBlank()) {
@@ -62,7 +67,7 @@ public class NotasService {
 
         Float total = data.getLotes().stream().map(l -> l.getPrecio() * l.getCantidad()).reduce(0f, Float::sum);
 
-        if (empresa.getCuentaIntegracion().size() > 0 && empresa.getCuentaIntegracion().get(0).getEstado() == "Activo") {
+        if (empresa.getCuentaIntegracion().size() > 0 && empresa.getCuentaIntegracion().get(0).getEstado().equals("Activo")) {
             //TODO: Crear la integracion
             //Siempre habrá solo 1, así que, agarramos ese 1
             CuentasIntegracion integracion = empresa.getCuentaIntegracion().get(0);
@@ -89,6 +94,12 @@ public class NotasService {
             comprobanteModel.setEstado("Abierto");
             comprobanteModel.setTc(moneda_empresa.getCambio());
             comprobanteModel.setUsuario(empresa.getUsuario());
+            //moneda
+            EmpresaMonedaModel mon = empresa.getMonedas().get(0);
+            MonedaModel moneda = monedaRepository.findById(mon.getId()).orElseThrow(
+                    () -> new RuntimeException("No se encontró la moneda")
+            );
+            comprobanteModel.setMoneda(moneda);
 
             comprobanteRepository.save(comprobanteModel);
             //Ahora los detalles de comprobante
@@ -214,9 +225,14 @@ public class NotasService {
     }
 
     public NotaCompraDTO una_nota_compra(String notaId) {
+        if (notaId == null || notaId.isEmpty()) {
+            throw new RuntimeException("Nota no encontrada");
+        }
+
         NotaModel nota = notasRepository.findById(Long.parseLong(notaId)).orElseThrow(
                 () -> new RuntimeException("Nota no encontrada")
         );
+
         NotaCompraDTO dto = new NotaCompraDTO();
         dto.setId(nota.getId());
         dto.setFecha(nota.getFecha());
@@ -236,6 +252,8 @@ public class NotasService {
                     productos.add(producto);
                 }
         );
+        dto.setEmpresa_nombre(nota.getEmpresa().getNombre());
+        dto.setUsuario(nota.getUsuario().getNombre());
         dto.setDetalles(productos);
         return dto;
     }
@@ -317,6 +335,8 @@ public class NotasService {
             productos.add(producto);
         });
         dto.setDetalles(productos);
+        dto.setEmpresa(nota.getEmpresa().getNombre());
+        dto.setUsuario(nota.getUsuario().getNombre());
         return dto;
     }
 

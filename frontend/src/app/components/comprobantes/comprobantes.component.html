@@ -20,7 +20,9 @@
       <mat-icon>description</mat-icon>
     </button>
   </div>
-  <p-table [value]="comprobantes" [columns]="cols" selectionMode="single" [(selection)]="selectedComprobante">
+
+  <p-table [scrollable]="true" [scrollHeight]="'300px'" [value]="comprobantes" [columns]="cols" selectionMode="single"
+    [(selection)]="selectedComprobante">
 
     <ng-template pTemplate="header" let-columns>
       <tr>
@@ -37,7 +39,9 @@
         <td>{{comprobante.moneda_nombre}}</td>
         <td>{{comprobante.tc}}</td>
         <td>{{comprobante.estado}}</td>
-        <td>{{comprobante.fecha}}</td>
+        <!-- Date dd/mm/yyyy -->
+        <td>{{comprobante.fecha | date: 'dd/MM/yyyy'}}</td>
+
       </tr>
     </ng-template>
   </p-table>

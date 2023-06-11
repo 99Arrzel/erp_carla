@@ -31,17 +31,22 @@ public class ComprobanteService {
     CuentaService cuentaService;
     @Autowired
     GestionService gestionService;
+
     public List<ComprobanteModel> listar(String empresa_id, String authHeader) throws Exception {
         String usuario = tokenGetUserService.username(authHeader);
         Long idUsuario = usuarioService.obtenerPorUsuario(usuario).orElseThrow(
                 () -> new RuntimeException("No existe usuario")
         ).getId();
-        List <ComprobanteModel> comprobantes = comprobanteRepository.findByEmpresaIdAndUsuarioId(Long.valueOf(empresa_id), idUsuario);
+        List<ComprobanteModel> comprobantes = comprobanteRepository.findByEmpresaIdAndUsuarioId(Long.valueOf(empresa_id), idUsuario);
         comprobantes.forEach(comprobante -> {
             comprobante.setMoneda_nombre(comprobante.getMoneda().getNombre());
+            comprobante.getDetalles().forEach(detalle -> {
+                detalle.setNumero(detalle.getCuenta().getCodigo() + " - " + detalle.getCuenta().getNombre());
+            });
         });
         return comprobantes;
     }
+
     public ComprobanteModel crear(ComprobanteRequest comprobante, String authHeader) throws Exception {
 
         /*
@@ -49,18 +54,18 @@ public class ComprobanteService {
         * */
 
         boolean continuar = periodoService.hayPeriodoAbiertoEnEmpresaYFecha(comprobante.getEmpresa_id(), comprobante.getFecha());
-        if(!continuar){
+        if (!continuar) {
             throw new RuntimeException("No hay periodo abierto en la fecha del comprobante");
         }
         //Solo uno de tipo "Apertura" por gestión, así que vamos a gestión con esta fecha
         GestionModel gestion_b = gestionService.gestionEnFechaConIdEmpresa(comprobante.getFecha(), comprobante.getEmpresa_id());
-        if (gestion_b == null){
+        if (gestion_b == null) {
             throw new RuntimeException("No existe gestión en esa fecha");
         }
         //Ahora vamos a buscar un comprobante en ese rango de fechaa_inicio y fecha_fin de la gestion, que sea de tipo apertura y esa empresa
-        if(comprobante.getTipo().equals("Apertura")){
+        if (comprobante.getTipo().equals("Apertura")) {
             ComprobanteModel comprobante_apertura = comprobanteRepository.buscarAperturaParaEmpresaEnFechaInicioYFechaFin(comprobante.getEmpresa_id(), gestion_b.getFechaInicio(), gestion_b.getFechaFin());
-            if(comprobante_apertura != null){
+            if (comprobante_apertura != null) {
                 System.out.println("Ya existe un comprobante de apertura en esa gestion");
                 System.out.println(comprobante_apertura);
                 throw new RuntimeException("Ya existe un comprobante de apertura en esa gestion");
@@ -140,11 +145,12 @@ public class ComprobanteService {
 
     public ComprobanteModel obtenerComprobanteApertura(Date fechaInicio, Date fechaFin, Long id_empresa) {
         var comprobante = comprobanteRepository.buscarAperturaParaEmpresaEnFechaInicioYFechaFin(id_empresa, fechaInicio, fechaFin);
-        if(comprobante == null){
+        if (comprobante == null) {
             throw new RuntimeException("No existe comprobante de apertura en ese rango de fechas, para esa empresa");
         }
         return comprobante;
     }
+
     public List<ComprobanteModel> obtenerComprobantesInicioFinEmpresa(Date fechaInicio, Date fechaFin, Long id_empresa) {
         return comprobanteRepository.buscarComprobantesParaEmpresaEnFechaInicioYFechaFin(id_empresa, fechaInicio, fechaFin);
     }

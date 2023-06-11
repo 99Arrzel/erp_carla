@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Notify } from 'notiflix';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
 import { hostUrl } from 'src/app/app-routing.module';
 
 @Component({
@@ -50,7 +50,7 @@ export class CrearNotaCompraComponent {
   }
   addLote() {
 
-    if (this.lotes.value.articulo == null) {
+    if (this.lotes.value.articulo == null || this.lotes.value.articulo?.id == undefined) {
       Notify.failure("Debe seleccionar un artículo");
       return;
     }
@@ -75,6 +75,7 @@ export class CrearNotaCompraComponent {
   articulosFiltrados: Observable<any[]> | undefined;
 
   private _filter(value: any): any[] {
+
     //si es un string, o sea si es l primera vez
     if (typeof value === 'string') {
       const filterValue = value.toLowerCase();
@@ -143,7 +144,7 @@ export class CrearNotaCompraComponent {
   articulos = <any>[];
   id_empresa: number = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
   fetchArticulos() {
-    this.http.post(`${hostUrl}/api/articulo/listar`, {
+    return this.http.post(`${hostUrl}/api/articulo/listar`, {
       empresa_id: this.id_empresa
     }, {
       headers: {
@@ -153,6 +154,17 @@ export class CrearNotaCompraComponent {
       next: (data: any) => {
         console.log(data, "Data");
         this.articulos = data;
+        //push to articulosFiltrados
+        //this.lotes.get('articulo')?.valueChanges.pipe(
+        //map(value => this._filter(value || ''))
+        //);
+        this.articulosFiltrados?.subscribe({
+          next: (datosFiltrados: any) => {
+            console.log(datosFiltrados, "Datos filtrados");
+            this.articulosFiltrados = of(datosFiltrados);
+          }
+        });
+
       },
       error: (e) => {
         console.error(e);
@@ -170,6 +182,7 @@ export class CrearNotaCompraComponent {
   };
   cambioProgramatico = false;
   ngOnInit(): void {
+    this.fetchArticulos();
     this.articulosFiltrados = this.lotes.get('articulo')?.valueChanges.pipe(
       map(value => this._filter(value || ''))
     );
@@ -187,6 +200,7 @@ export class CrearNotaCompraComponent {
       }).subscribe({
         next: (data: any) => {
           this.notaCompra.patchValue({ nro_nota: data });
+
           console.log(data, "ultimo numero");
         }
       });
@@ -197,7 +211,11 @@ export class CrearNotaCompraComponent {
       }, { emitEvent: false });
     });
 
-    this.fetchArticulos();
+
+
+
+
+
   }
 
 }

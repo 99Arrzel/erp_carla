@@ -18,4 +18,7 @@ public class NotaCompraDTO {
     //Array de detalles
     List<NotaCompraProductosDTO> detalles;
     Float total;
+    //Empresa
+    String empresa_nombre;
+    String usuario;
 }

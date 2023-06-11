@@ -24,7 +24,7 @@ import { MatTableModule } from '@angular/material/table';
 import { DialogGestionComponent } from './components/gestiones/dialog-gestion/dialog-gestion.component';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 //mat-checkbox
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { TableModule } from 'primeng/table';
@@ -75,6 +75,7 @@ export function handleMsgError(e: HttpErrorResponse) {
 
 
 @NgModule({
+
   declarations: [
     AppComponent,
     HomeComponent,
@@ -136,7 +137,9 @@ export function handleMsgError(e: HttpErrorResponse) {
 
 
   ],
-  providers: [],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' }
+  ],
   bootstrap: [AppComponent],
   exports: [
     DialogEmpresaComponent

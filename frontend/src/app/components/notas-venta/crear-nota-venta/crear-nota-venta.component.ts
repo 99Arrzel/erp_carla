@@ -45,7 +45,7 @@ export class CrearNotaVentaComponent {
 
   addLote() {
 
-    if (this.lotes.value.articulo == null) {
+    if (this.lotes.value.articulo == null || this.lotes.value.articulo?.id == undefined) {
       Notify.failure("Debe seleccionar un artículo");
       return;
     }
@@ -201,11 +201,10 @@ export class CrearNotaVentaComponent {
       this.lotes.patchValue({
         subtotal: (v.cantidad ?? 0) * (v.precio ?? 0)
       }, { emitEvent: false });
-      if (v.articulo != null) {
+      if (v.articulo != null && v.lote == null) {
         this.lotes_articulo = v.articulo.lotes.filter((l: any) => l.stock > 0);
         //Filtrar lote también cuando esté agregado
         console.log(this.lotes_articulo, "lotes articulo");
-
         //Seleccionar el lote más antiguo
         if (this.lotes_articulo.length > 0) {
           this.lotes.patchValue({
