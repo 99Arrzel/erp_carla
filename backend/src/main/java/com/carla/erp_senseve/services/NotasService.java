@@ -38,6 +38,9 @@ public class NotasService {
     EmpresaMonedaRepository empresaMonedaRepository;
 
     @Autowired
+
+    DetalleComprobanteRepository detallesComprobanteRepository;
+    @Autowired
     MonedaRepository monedaRepository;
 
     public List<NotaModel> listar(String empresaId, String tipo) {
@@ -63,12 +66,14 @@ public class NotasService {
         EmpresaModel empresa = empresaRepository.findById(data.getEmpresa_id()).orElseThrow(
                 () -> new RuntimeException("Empresa no encontrada")
         );
+
+
         ComprobanteModel comprobante = null;
 
         Float total = data.getLotes().stream().map(l -> l.getPrecio() * l.getCantidad()).reduce(0f, Float::sum);
 
         if (empresa.getCuentaIntegracion().size() > 0 && empresa.getCuentaIntegracion().get(0).getEstado().equals("Activo")) {
-            //TODO: Crear la integracion
+            System.out.println("Integracion activa");
             //Siempre habrá solo 1, así que, agarramos ese 1
             CuentasIntegracion integracion = empresa.getCuentaIntegracion().get(0);
             EmpresaMonedaModel moneda_empresa = empresa.getMonedas().stream().filter(m -> m.getEstado()).findFirst().orElseThrow(
@@ -95,12 +100,10 @@ public class NotasService {
             comprobanteModel.setTc(moneda_empresa.getCambio());
             comprobanteModel.setUsuario(empresa.getUsuario());
             //moneda
-            EmpresaMonedaModel mon = empresa.getMonedas().get(0);
-            MonedaModel moneda = monedaRepository.findById(mon.getId()).orElseThrow(
-                    () -> new RuntimeException("No se encontró la moneda")
-            );
-            comprobanteModel.setMoneda(moneda);
-
+            MonedaModel mon = empresa.getMonedas().get(0).getMoneda_principal();
+            System.out.println(mon.getId());
+            System.out.println("            System.out.println(mon.getId());\n");
+            comprobanteModel.setMoneda(mon);
             comprobanteRepository.save(comprobanteModel);
             //Ahora los detalles de comprobante
             List<DetalleComprobanteModel> detalles = new ArrayList<>();
@@ -115,7 +118,9 @@ public class NotasService {
             compras.setNumero("1");
             compras.setUsuario(empresa.getUsuario());
             compras.setComprobante(comprobanteModel);
+
             detalles.add(compras);
+            detallesComprobanteRepository.save(compras);
             //Credito fiscal
             DetalleComprobanteModel credito = new DetalleComprobanteModel();
             credito.setCuenta(integracion.getCuenta_credito_fiscal());
@@ -128,25 +133,35 @@ public class NotasService {
             credito.setUsuario(empresa.getUsuario());
             credito.setComprobante(comprobanteModel);
             detalles.add(credito);
+            detallesComprobanteRepository.save(credito);
             //Caja
             DetalleComprobanteModel caja = new DetalleComprobanteModel();
             caja.setCuenta(integracion.getCuenta_caja());
+            /*
             caja.setMonto_debe((float) (total));
             caja.setMonto_debe_alt((float) (total) * moneda_empresa.getCambio());
             caja.setMonto_haber(0f);
             caja.setMonto_haber_alt(0f);
+             */
+            caja.setMonto_haber((float) (total));
+            caja.setMonto_haber_alt((float) (total) * moneda_empresa.getCambio());
+            caja.setMonto_debe(0f);
+            caja.setMonto_debe_alt(0f);
             caja.setGlosa("Compra de mercaderías");
             caja.setNumero("3");
             caja.setUsuario(empresa.getUsuario());
             caja.setComprobante(comprobanteModel);
             detalles.add(caja);
+            detallesComprobanteRepository.save(caja);
             //guardar
-
+            /*
             comprobanteModel.setDetalles(detalles);
             comprobanteRepository.save(comprobanteModel);
+            */
+            comprobanteModel.setDetalles(detalles);
+            comprobanteRepository.save(comprobanteModel);
+
             comprobante = comprobanteModel;
-
-
         }
         NotaModel nota = new NotaModel();
         nota.setDescripcion(data.getDescripcion());
@@ -200,11 +215,11 @@ public class NotasService {
         NotaModel nota = notasRepository.findById(Long.parseLong(notaId)).orElseThrow(
                 () -> new RuntimeException("Nota no encontrada")
         );
-        if (nota.getEstado().equals("ANULADO")) {
+        if (nota.getEstado().equals("Anulado")) {
             throw new RuntimeException("Nota ya anulada");
         }
 
-        nota.setEstado("ANULADO");
+        nota.setEstado("Anulado");
         //From each detail (Lote) remove stock
         nota.getLote().forEach(lotesModel -> {
                     //chequear que stock sea diferente de cantidad
@@ -212,13 +227,13 @@ public class NotasService {
                         throw new RuntimeException("No se puede anular la nota, ya se vendió parte del stock");
                     }
                     lotesModel.getArticulo().setStock((int) (lotesModel.getArticulo().getStock() - lotesModel.getCantidad()));
-                    lotesModel.setEstado("ANULADO");
+                    lotesModel.setEstado("Anulado");
                     lotesRepository.save(lotesModel);
                 }
         );
         if (nota.getComprobante() != null) {
             ComprobanteModel comp = nota.getComprobante();
-            comp.setEstado("ANULADO");
+            comp.setEstado("Anulado");
             comprobanteRepository.save(comp);
         }
         return notasRepository.save(nota);
@@ -262,11 +277,148 @@ public class NotasService {
         EmpresaModel empresa = empresaRepository.findById(data.getEmpresa_id()).orElseThrow(
                 () -> new RuntimeException("Empresa no encontrada")
         );
-        ComprobanteModel comprobante = null;
+        ComprobanteModel comprobante;
 
         Float total = data.getLotes().stream().map(l -> l.getPrecio() * l.getCantidad()).reduce(0f, Float::sum);
-        if (empresa.getCuentaIntegracion().size() > 0 && empresa.getCuentaIntegracion().get(0).getEstado() == "Activo") {
-            //Crear comprobante
+        if (empresa.getCuentaIntegracion().size() > 0 && empresa.getCuentaIntegracion().get(0).getEstado().equals("Activo")) {
+            System.out.println("Integracion activa");
+            //Siempre habrá solo 1, así que, agarramos ese 1
+            CuentasIntegracion integracion = empresa.getCuentaIntegracion().get(0);
+            EmpresaMonedaModel moneda_empresa = empresa.getMonedas().stream().filter(m -> m.getEstado()).findFirst().orElseThrow(
+                    () -> new RuntimeException("No se encontró la moneda")
+            );
+            //buscamos periodo abierto en data.getFecha()
+            List<GestionModel> gestiones = empresa.getGestiones().stream().filter(
+                    g -> g.getPeriodos().stream().filter(
+                            p -> p.getEstado() && p.getFechaInicio().compareTo(data.getFecha()) <= 0 && p.getFechaFin().compareTo(data.getFecha()) >= 0
+                    ).count() > 0
+            ).toList();
+            if (gestiones.size() == 0) {
+                throw new RuntimeException("No se encontró el periodo abierto");
+            }
+            ComprobanteModel comprobanteModel = new ComprobanteModel();
+            comprobanteModel.setEmpresa(empresa);
+            comprobanteModel.setFecha(data.getFecha());
+            //Ultima serie de comprobante
+            String serie = String.valueOf(comprobanteRepository.contar(empresa.getId()) + 1);
+            comprobanteModel.setSerie(serie);
+            comprobanteModel.setGlosa("Venta de mercaderías");
+            comprobanteModel.setTipo("Ingreso");
+            comprobanteModel.setEstado("Abierto");
+            comprobanteModel.setTc(moneda_empresa.getCambio());
+            comprobanteModel.setUsuario(empresa.getUsuario());
+            //moneda
+            MonedaModel mon = empresa.getMonedas().get(0).getMoneda_principal();
+            System.out.println(mon.getId());
+            System.out.println("            System.out.println(mon.getId());\n");
+            comprobanteModel.setMoneda(mon);
+            comprobanteRepository.save(comprobanteModel);
+            //Ahora los detalles de comprobante
+            List<DetalleComprobanteModel> detalles = new ArrayList<>();
+            //Lógica de compras
+            /*
+            DetalleComprobanteModel compras = new DetalleComprobanteModel();
+            compras.setCuenta(integracion.getCuenta_compras());
+            compras.setMonto_debe((float) (total * 0.87));
+            compras.setMonto_debe_alt((float) (total * 0.87) * moneda_empresa.getCambio());
+            compras.setMonto_haber(0f);
+            compras.setMonto_haber_alt(0f);
+            compras.setGlosa("Compra de mercaderías");
+            compras.setNumero("1");
+            compras.setUsuario(empresa.getUsuario());
+            compras.setComprobante(comprobanteModel);
+
+            detalles.add(compras);
+            detallesComprobanteRepository.save(compras);
+            */
+            //Cambia la cosa, ahora es con caja y es debe
+            DetalleComprobanteModel caja = new DetalleComprobanteModel();
+            caja.setCuenta(integracion.getCuenta_caja());
+            caja.setMonto_debe(total);
+            caja.setMonto_debe_alt(total * moneda_empresa.getCambio());
+            caja.setMonto_haber(0f);
+            caja.setMonto_haber_alt(0f);
+            caja.setGlosa("Venta de mercaderías");
+            caja.setNumero("1");
+            caja.setUsuario(empresa.getUsuario());
+            caja.setComprobante(comprobanteModel);
+            detalles.add(caja);
+            detallesComprobanteRepository.save(caja);
+            /*
+            //Credito fiscal
+            DetalleComprobanteModel credito = new DetalleComprobanteModel();
+            credito.setCuenta(integracion.getCuenta_credito_fiscal());
+            credito.setMonto_debe((float) (total * 0.13));
+            credito.setMonto_debe_alt((float) (total * 0.13) * moneda_empresa.getCambio());
+            credito.setMonto_haber(0f);
+            credito.setMonto_haber_alt(0f);
+            credito.setGlosa("Compra de mercaderías");
+            credito.setNumero("2");
+            credito.setUsuario(empresa.getUsuario());
+            credito.setComprobante(comprobanteModel);
+            detalles.add(credito);
+            detallesComprobanteRepository.save(credito);
+             */
+            //En vez de credito fiscal, tenemos impuestos a las transacciones IT, 3% del total
+            DetalleComprobanteModel it = new DetalleComprobanteModel();
+            it.setCuenta(integracion.getCuenta_it());
+            it.setMonto_debe((float) (total * 0.03));
+            it.setMonto_debe_alt((float) (total * 0.03) * moneda_empresa.getCambio());
+            it.setMonto_haber(0f);
+            it.setMonto_haber_alt(0f);
+            it.setGlosa("Venta de mercaderías");
+            it.setNumero("2");
+            it.setUsuario(empresa.getUsuario());
+            it.setComprobante(comprobanteModel);
+            detalles.add(it);
+            detallesComprobanteRepository.save(it);
+            //Ahora tenemos la parte de ventas, que es haber, del total - debito fiscal (100 - 13)
+            DetalleComprobanteModel ventas = new DetalleComprobanteModel();
+            ventas.setCuenta(integracion.getCuenta_ventas());
+            ventas.setMonto_debe(0f);
+            ventas.setMonto_debe_alt(0f);
+            ventas.setMonto_haber(total * 0.87f);
+            ventas.setMonto_haber_alt((total * 0.87f) * moneda_empresa.getCambio());
+            ventas.setGlosa("Venta de mercaderías");
+            ventas.setNumero("3");
+            ventas.setUsuario(empresa.getUsuario());
+            ventas.setComprobante(comprobanteModel);
+            detalles.add(ventas);
+            detallesComprobanteRepository.save(ventas);
+            //Después tenemos lo que es debito fiscal, el 13%, en haber
+            DetalleComprobanteModel debito = new DetalleComprobanteModel();
+            debito.setCuenta(integracion.getCuenta_debito_fiscal());
+
+            debito.setMonto_debe(0f);
+            debito.setMonto_debe_alt(0f);
+            debito.setMonto_haber(total * 0.13f);
+            debito.setMonto_haber_alt((total * 0.13f) * moneda_empresa.getCambio());
+            debito.setGlosa("Venta de mercaderías");
+            debito.setNumero("4");
+            debito.setUsuario(empresa.getUsuario());
+            debito.setComprobante(comprobanteModel);
+            detalles.add(debito);
+            detallesComprobanteRepository.save(debito);
+            //Finalmente el IT por pagar, que es en el haber y es el 3%
+            DetalleComprobanteModel itp = new DetalleComprobanteModel();
+            itp.setCuenta(integracion.getCuenta_it_por_pagar());
+            itp.setMonto_debe(0f);
+            itp.setMonto_debe_alt(0f);
+            itp.setMonto_haber(total * 0.03f);
+            itp.setMonto_haber_alt((total * 0.03f) * moneda_empresa.getCambio());
+            itp.setGlosa("Venta de mercaderías");
+            itp.setNumero("5");
+            itp.setUsuario(empresa.getUsuario());
+            itp.setComprobante(comprobanteModel);
+            detalles.add(itp);
+            detallesComprobanteRepository.save(itp);
+
+            comprobanteModel.setDetalles(detalles);
+            comprobanteRepository.save(comprobanteModel);
+
+            comprobante = comprobanteModel;
+        } else {
+            comprobante = null;
         }
         NotaModel nota = new NotaModel();
         nota.setDescripcion(data.getDescripcion());
@@ -344,10 +496,10 @@ public class NotasService {
         NotaModel nota = notasRepository.findById(Long.parseLong(notaId)).orElseThrow(
                 () -> new RuntimeException("Nota no encontrada")
         );
-        if (nota.getEstado().equals("ANULADO")) {
+        if (nota.getEstado().equals("Anulado")) {
             throw new RuntimeException("Nota ya anulada");
         }
-        nota.setEstado("ANULADO");
+        nota.setEstado("Anulado");
         //From each detail (Lote) remove stock
         //los detalles no, en los lotes
         nota.getDetalle().forEach(detalle -> {

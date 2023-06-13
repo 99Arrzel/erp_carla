@@ -180,5 +180,32 @@
         </button>
       </div>
     </p-tabPanel>
+    <p-tabPanel header="Balance general">
+      <p>Balance general</p>
+      <!-- Dropdown -->
+      <div class="flex gap-2">
+        <mat-form-field appearance="fill">
+          <mat-label>Gestion</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let gestion of gestiones" [value]="gestion"
+              (onSelectionChange)="setActionGestionBG($event)">
+              {{ gestion?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <!-- De monedas -->
+        <mat-form-field appearance="fill">
+          <mat-label>Monedas</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let moneda of monedas" [value]="moneda" (onSelectionChange)="setActionMonedaBG($event)">
+              {{ moneda?.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReporteBG()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </p-tabPanel>
   </p-tabView>
 </div>

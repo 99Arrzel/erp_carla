@@ -68,9 +68,19 @@ public class ArticuloService {
     }
 
     public ArticuloModel eliminar(Long id) {
+        System.out.println("ArticuloService.eliminar");
+        System.out.println(id);
         ArticuloModel articuloModel = articuloRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("El articulo no existe")
         );
+        //Si tiene lotes no se puede eliminar
+        if (articuloModel.getLotes().size() > 0) {
+            throw new RuntimeException("El articulo tiene lotes");
+        }
+        //Eliminamos relaciones primero
+        articuloModel.setCategoria(null);
+        articuloRepository.save(articuloModel);
+        //Then delete
         articuloRepository.delete(articuloModel);
         return articuloModel;
     }
@@ -88,7 +98,7 @@ public class ArticuloService {
             //De la lista de artigulos, hay lotes, filtrame los lotes que tengan estado "ANULADO"
             List<LotesModel> lotesModels = articuloModel.getLotes();
             for (LotesModel lotesModel : lotesModels) {
-                if (lotesModel.getEstado().equals("ANULADO")) {
+                if (lotesModel.getEstado().equals("Anulado")) {
                     System.out.println("Lote anulado");
                     System.out.println(lotesModel.getEstado());
                     lotesModel.setArticulo(null);

@@ -368,7 +368,9 @@ public class ReporteComprobanteService {
         GestionModel gestion = gestionService.obtenerGestion(Long.parseLong(idGestion));
         ReporteEstadoResultadosModel reporteEstadoResultadosModel = new ReporteEstadoResultadosModel();
         reporteEstadoResultadosModel.setFecha(gestion.getFechaFin());
-
+        reporteEstadoResultadosModel.setEmpresa(gestion.getEmpresa().getNombre());
+        reporteEstadoResultadosModel.setUsuario(gestion.getUsuario().getNombre());
+        reporteEstadoResultadosModel.setMoneda(moneda.getNombre());
         //Ahora hay que encontrar todos los comprantes en una gestión
         List<ComprobanteModel> comprobantes = comprobanteService.obtenerComprobantesInicioFinEmpresa(gestion.getFechaInicio(), gestion.getFechaFin(), gestion.getEmpresa().getId());
 
@@ -459,12 +461,152 @@ public class ReporteComprobanteService {
         reporteEstadoResultadosModel.setGastos(estadoResultadosList2);
         reporteEstadoResultadosModel.setTotal_gastos((float) estadoResultadosList2.stream().mapToDouble(EstadoResultado::getSaldo).sum());
         reporteEstadoResultadosModel.setUtilidad_operativa(reporteEstadoResultadosModel.getTotal_ingresos() - reporteEstadoResultadosModel.getTotal_costos() - reporteEstadoResultadosModel.getTotal_gastos());
+        reporteEstadoResultadosModel.setUtilidad_bruta(reporteEstadoResultadosModel.getTotal_ingresos() - reporteEstadoResultadosModel.getTotal_costos());
         System.out.println(reporteEstadoResultadosModel.getUtilidad_operativa());
         System.out.println(reporteEstadoResultadosModel.getCostos());
         System.out.println(reporteEstadoResultadosModel.getGastos());
         reporteEstadoResultadosModel.getIngresos().forEach(estadoResultado -> {
             System.out.println(estadoResultado.getNombre_cuenta() + " " + estadoResultado.getSaldo());
         });
+        //Set todo a math abs, nada de negativos
+        reporteEstadoResultadosModel.setUtilidad_operativa(Math.abs(reporteEstadoResultadosModel.getUtilidad_operativa()));
+        reporteEstadoResultadosModel.setUtilidad_bruta(Math.abs(reporteEstadoResultadosModel.getUtilidad_bruta()));
+        reporteEstadoResultadosModel.setTotal_ingresos(Math.abs(reporteEstadoResultadosModel.getTotal_ingresos()));
+        reporteEstadoResultadosModel.setTotal_costos(Math.abs(reporteEstadoResultadosModel.getTotal_costos()));
+        reporteEstadoResultadosModel.setTotal_gastos(Math.abs(reporteEstadoResultadosModel.getTotal_gastos()));
+
+
         return reporteEstadoResultadosModel;
+    }
+
+    public ReporteBalanceGeneralModel reporte_balance_general(String idMoneda, String idGestion) {
+        //Esto es como el balance inicial, pero no un solo comprobante, sino, la sumarización de todos los comprobantes en la gestión que estén activos
+        //Obtener la gestión
+
+
+        GestionModel gestion = gestionService.obtenerGestion(Long.parseLong(idGestion));
+        //Moneda
+        MonedaModel moneda = monedaService.obtenerMoneda(Long.parseLong(idMoneda));
+
+        //Verificamos si la moneda es la misma que la moneda base de la empresa, la principal
+        EmpresaModel empresa = gestion.getEmpresa();
+        //getCuentasActivoPasivoPatrimonio
+        List<CuentaModel> cuentas = cuentaService.getCuentasActivoPasivoPatrimonio(gestion.getEmpresa().getId());
+        //Iteramos sobre cuentas y removemos los que no estén en la gestion, osea desde fecha_inicio y fecha_fin
+    /*
+    cuentas.forEach(cuenta -> {
+            cuenta.getDetalle_comprobantes().removeIf(detalle -> {
+                        return detalle.getComprobante().getId() != comprobanteModel.getId();
+                    }
+            );
+        });
+    * */
+        cuentas.forEach(cuenta -> {
+            cuenta.getDetalle_comprobantes().removeIf(detalle -> {
+                return detalle.getComprobante().getFecha().before(gestion.getFechaInicio()) || detalle.getComprobante().getFecha().after(gestion.getFechaFin());
+            });
+        });
+        //Bomba, ya tenemos todos los detalles de comprobantes de la gestion
+        //Ahora, iteramos sobre las cuentas, y sumamos los montos de los detalles de los comprobantes para agregarlo al modelo
+        ReporteBalanceGeneralModel reporteBalanceGeneralModel = new ReporteBalanceGeneralModel();
+        List<CuentaParaReporteBalanceInicial> cuentas_balance_inicial = new ArrayList<>();
+
+        cuentas.forEach(cuenta -> {
+            CuentaParaReporteBalanceInicial cuentaParaReporteBalanceInicial1 = new CuentaParaReporteBalanceInicial();
+            cuentaParaReporteBalanceInicial1.setId(cuenta.getId());
+            if (cuenta.getPadre() != null) {
+                cuentaParaReporteBalanceInicial1.setId_padre(cuenta.getPadre().getId());
+            } else {
+                cuentaParaReporteBalanceInicial1.setId_padre(null);
+            }
+            cuentaParaReporteBalanceInicial1.setNombre(cuenta.getNombre());
+            cuentaParaReporteBalanceInicial1.setCodigo(cuenta.getCodigo());
+            cuentaParaReporteBalanceInicial1.setNivel(cuenta.getNivel());
+            /*
+            * En la seccion de Activo se debe sumar el total del Debe menos el total del Haber por cada cuenta de activo. Ej. Caja : SUM(Debe) - SUM(Haber)
+            En la seccion de Pasivo y Patrimonio se debe sumar el total del Haber menos el total del Debe por cada cuenta de pasivo o patrimonio. Ej. Capital Social: SUM(Haber) - SUM(Debe)
+            * */
+            Float total = 0f;
+            //Verificar activo, empieza con 1.%
+
+            if (empresa.getMonedas().get(0).getMoneda_principal().getId().equals(moneda.getId())) {
+                if (cuenta.getCodigo().startsWith("1.")) {
+                    //Sumar total del debe menos el total del haber
+                    total = (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_debe).sum() - (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_haber).sum();
+                }
+                //Verificar pasivo y patrimonio, empieza con 2.% o 3.%
+                if (cuenta.getCodigo().startsWith("2.") || cuenta.getCodigo().startsWith("3.")) {
+                    //Sumar total del haber menos el total del debe
+                    total = (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_haber).sum() - (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_debe).sum();
+                }
+            }//Sino, es la alternativa seguramente
+            else {
+                if (cuenta.getCodigo().startsWith("1.")) {
+                    //Sumar total del debe menos el total del haber
+                    total = (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_debe_alt).sum() - (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_haber_alt).sum();
+                }
+                //Verificar pasivo y patrimonio, empieza con 2.% o 3.%
+                if (cuenta.getCodigo().startsWith("2.") || cuenta.getCodigo().startsWith("3.")) {
+                    //Sumar total del haber menos el total del debe
+                    total = (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_haber_alt).sum() - (float) cuenta.getDetalle_comprobantes().stream().mapToDouble(DetalleComprobanteModel::getMonto_debe_alt).sum();
+                }
+            }
+            cuentaParaReporteBalanceInicial1.setSaldo(total);
+            cuentas_balance_inicial.add(cuentaParaReporteBalanceInicial1);
+        });
+        //Seteamos el modelo
+        reporteBalanceGeneralModel.setCuentas(cuentas_balance_inicial);
+        //Finalmente solo los detalles
+        reporteBalanceGeneralModel.setGestion(gestion.getNombre());
+        reporteBalanceGeneralModel.setGestion_inicio(gestion.getFechaInicio());
+        reporteBalanceGeneralModel.setGestion_fin(gestion.getFechaFin());
+        reporteBalanceGeneralModel.setMoneda(moneda.getNombre());
+        reporteBalanceGeneralModel.setEmpresa(gestion.getEmpresa().getNombre());
+        reporteBalanceGeneralModel.setUsuario(gestion.getUsuario().getNombre());
+
+        //Olvide sumar de hijos a padres
+        //Iteramos sobre las cuentas, y si el padre es null, es decir, es una cuenta de primer nivel, entonces sumamos los saldos de sus hijos
+        /*
+        for (int i = cuentas.size() - 1; i >= 0; i--) {
+            CuentaModel cuenta = cuentas.get(i);
+            if (cuenta.getPadre() != null) {
+                if (cuenta.getTotal_balance_inicial() == null) {
+                    cuenta.setTotal_balance_inicial(0.0f);
+                }
+                //cuenta.getPadre().setTotal_balance_inicial(cuenta.getPadre().getTotal_balance_inicial() + cuenta.getTotal_balance_inicial()); hay que verificar que getTotal no sea null
+                if (cuenta.getPadre().getTotal_balance_inicial() != null && cuenta.getTotal_balance_inicial() != null) {
+                    cuenta.getPadre().setTotal_balance_inicial(cuenta.getPadre().getTotal_balance_inicial() + cuenta.getTotal_balance_inicial());
+                } else {
+                    if (cuenta.getTotal_balance_inicial() != null) {
+                        cuenta.getPadre().setTotal_balance_inicial(cuenta.getTotal_balance_inicial());
+                    }
+                }
+            }
+        }
+         */
+        //Mas o menos como el ejemplo de arriba
+        for (int i = cuentas_balance_inicial.size() - 1; i >= 0; i--) {
+            CuentaParaReporteBalanceInicial cuenta = cuentas_balance_inicial.get(i);
+            if (cuenta.getId_padre() != null) {
+                if (cuenta.getSaldo() == null) {
+                    cuenta.setSaldo(0.0f);
+                }
+                //cuenta.getPadre().setTotal_balance_inicial(cuenta.getPadre().getTotal_balance_inicial() + cuenta.getTotal_balance_inicial()); hay que verificar que getTotal no sea null
+                if (cuenta.getSaldo() != null) {
+                    cuentas_balance_inicial.forEach(cuenta1 -> {
+                        if (cuenta1.getId().equals(cuenta.getId_padre())) {
+                            if (cuenta1.getSaldo() != null) {
+                                cuenta1.setSaldo(cuenta1.getSaldo() + cuenta.getSaldo());
+                            } else {
+                                cuenta1.setSaldo(cuenta.getSaldo());
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+
+        return reporteBalanceGeneralModel;
     }
 }

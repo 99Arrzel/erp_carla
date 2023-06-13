@@ -1,0 +1,38 @@
+<!-- Una tabla con nro_lote, estado, fecha_vencimiento, fecha_ingreso, cantidad y stock  -->
+
+<div class="p-2">
+  <h1 class="text-center">Lotes del articulo</h1>
+  <p-table [value]="this.data.articulo.lotes" [paginator]="true" [rows]="10" [responsive]="true">
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th *ngFor="let col of ['Número de lote', 'Estado', 'Fecha Vencimiento', 'Fecha Ingreso', 'Cantidad', 'Stock']"
+          [pSortableColumn]="col">
+          {{col}}
+        </th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-lotes>
+      <tr>
+        <td>
+          {{lotes.nro_lote}}
+        </td>
+        <td>
+          {{lotes.estado }}
+        </td>
+        <td>
+          {{lotes.fecha_vencimiento | date:'dd/MM/yyyy'}}
+        </td>
+        <td>
+          {{lotes.fecha_ingreso | date:'dd/MM/yyyy'}}
+        </td>
+        <td>
+          {{lotes.cantidad}}
+        </td>
+        <td>
+          {{lotes.stock}}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+</div>

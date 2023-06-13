@@ -148,4 +148,22 @@ public class ReportesController {
             return ResponseEntity.badRequest().body(e.getMessage().toString());
         }
     }
+
+    //Falta nomás el de balance general
+    @PostMapping(value = "/reporte-balance-general", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> reporte_balance_general(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam Map<String, String> data
+    ) {
+        try {
+            System.out.println(data.get("id_moneda"));
+            System.out.println(data.get("id_gestion"));
+
+            ReporteBalanceGeneralModel reporteComprobanteModel = reporteComprobanteService.reporte_balance_general(data.get("id_moneda"), data.get("id_gestion"));
+            return ResponseEntity.ok().body(reporteComprobanteModel);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
 }

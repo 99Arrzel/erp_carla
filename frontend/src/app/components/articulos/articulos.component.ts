@@ -5,6 +5,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Notiflix from 'notiflix';
 import { hostUrl } from 'src/app/app-routing.module';
+import { CrearArticuloModalComponent } from './crear-articulo-modal/crear-articulo-modal.component';
+import { EditarArticuloModalComponent } from './editar-articulo-modal/editar-articulo-modal.component';
+import { LotesArticuloModalComponent } from './lotes-articulo-modal/lotes-articulo-modal.component';
 
 @Component({
   selector: 'app-articulos',
@@ -20,9 +23,20 @@ export class ArticulosComponent {
     descripcion: new FormControl('', [Validators.required]),
     precio_venta: new FormControl(0, [Validators.required]),
     categorias: new FormControl([], [Validators.required]),
-
-
   });
+
+
+  verLotes() {
+    if (this.selected?.id == null) {
+      Notiflix.Notify.failure("Seleccione un artículo");
+      return;
+    }
+    const dialogRef = this.dialog.open(LotesArticuloModalComponent, {
+      data: {
+        articulo: this.selected
+      }
+    });
+  }
   articulos: any[] = [];
 
   cols: any[] = [ //Columnas de la tabla
@@ -35,107 +49,50 @@ export class ArticulosComponent {
 
   categorias: any[] = [];
   crearArticulo() {
-    console.log("epa");
-    if (this.articuloForm.value.nombre?.trim() == "") {
-      Notiflix.Notify.failure("El nombre del artículo no puede estar vacío");
-      return;
-    }
-    if (this.articuloForm.value.descripcion?.trim() == "") {
-      Notiflix.Notify.failure("La descripción del artículo no puede estar vacía");
-      return;
-    }
-    if (this.articuloForm.value.precio_venta == null) {
-      Notiflix.Notify.failure("El precio de venta del artículo no puede estar vacío");
-      return;
-    }
-    if (this.articuloForm.value.precio_venta && this.articuloForm.value.precio_venta <= 0) {
-      Notiflix.Notify.failure("El precio de venta del artículo no puede estar vacío");
-      return;
-    }
-    if (this.articuloForm.value.categorias?.length == 0) {
-      Notiflix.Notify.failure("Seleccione al menos una categoría");
-      return;
-    }
 
-    if (this.titulo == "Crear Artículo") {
-      this.http.post(`${hostUrl}/api/articulo/crear`, {
-        /*    data.getNombre(),
-                      data.getDescripcion(),
-                      data.getPrecio(),
-                      data.getCategorias(), */
-        nombre: this.articuloForm.value.nombre,
-        descripcion: this.articuloForm.value.descripcion,
-        precio: this.articuloForm.value.precio_venta,
-        categorias: this.articuloForm.value.categorias,
+    //Abrir modal del articulo, crear-articulo
+    const dialogRef = this.dialog.open(CrearArticuloModalComponent, {
+      data: {
+        categorias: this.categorias,
         empresa_id: this.id_empresa,
-      }, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
-        }
-      }).subscribe({
-        next: (data) => {
-          Notiflix.Notify.success("Artículo creado con éxito");
-          console.log(data);
-          this.articuloForm.reset();
-          this.fetchArticulos();
-          //this.updateArticulos();
-        },
-        error: (e) => {
-          Notiflix.Notify.failure(e.error?.msg);
-        },
-      });
-    }
-    else {
-      this.http.post(`${hostUrl}/api/articulo/editar`, {
-
-        id: this.articuloForm.value.id,
-        nombre: this.articuloForm.value.nombre,
-        descripcion: this.articuloForm.value.descripcion,
-        precio: this.articuloForm.value.precio_venta,
-        categorias: this.articuloForm.value.categorias,
-      }, {
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("token")
-        }
-      }).subscribe({
-        next: (data) => {
-          Notiflix.Notify.success("Artículo editado con éxito");
-          console.log(data);
-          //Resetear form
-
-          this.articuloForm.reset();
-          this.fetchArticulos();
-          //this.updateArticulos();
-        },
-        error: (e) => {
-          Notiflix.Notify.failure(e.error?.msg);
-        }
-      });
-      this.titulo = "Crear Artículo";
-    }
-
-
-    console.log(this.articuloForm.value);
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      this.fetchArticulos();
+    });
   }
-  editarArticulo(a: any) {
+  editarArticulo() {
+    if (this.selected?.id == null) {
+      Notiflix.Notify.failure("Seleccione un artículo");
+      return;
+    }
     //seteamo el form
-    this.articuloForm.controls.id.setValue(a.id);
-    this.articuloForm.controls.nombre.setValue(a.nombre);
-    this.articuloForm.controls.descripcion.setValue(a.descripcion);
-    this.articuloForm.controls.precio_venta.setValue(a.precio);
-    this.articuloForm.controls.categorias.setValue(a.categoria);
-    this.titulo = "Editar Artículo";
-
-    console.log(a);
+    const dialogRef = this.dialog.open(EditarArticuloModalComponent, {
+      data: {
+        articulo: this.selected,
+        categorias: this.categorias,
+        empresa_id: this.id_empresa,
+      }
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+      this.fetchArticulos();
+    });
   }
-  eliminarArticulo(a: any) {
+  eliminarArticulo() {
+    if (this.selected?.id == null) {
+      Notiflix.Notify.failure("Seleccione un artículo");
+      return;
+    }
     Notiflix.Confirm.show(
       'Eliminar Artículo',
       '¿Está seguro que desea eliminar el artículo?',
       'Si',
       'No',
       () => {
-        this.http.post<any>(`${hostUrl}/api/articulo/eliminar`, { id: a.id }, {
+        ////id del selected
+        this.http.post<any>(`${hostUrl}/api/articulo/eliminar`, { id: this.selected?.id }, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token")
           }
@@ -180,6 +137,8 @@ export class ArticulosComponent {
       }
     });
   }
+
+  selected: any = null;
   listarCategorias(cats: any) {
 
     let str = "";

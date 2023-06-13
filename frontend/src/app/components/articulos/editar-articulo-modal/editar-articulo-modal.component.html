@@ -1,0 +1,37 @@
+<div class="p-2">
+  <h1 class="text-center text-white">Editar Articulo</h1>
+  <!-- Tiene un nombre, una descripción, un precio de venta y categorias -->
+  <!-- Solo son inputs y un dropdown de selección múltiple en categorias -->
+
+  <form [formGroup]="articuloForm" class="flex  gap-4 items-center">
+    <div>
+      <p>Nombre</p>
+      <input type="text" class="w-full p-2 py-4" formControlName="nombre">
+    </div>
+    <div>
+      <p>Descripción</p>
+      <input type="text" class="w-full  p-2 py-4" formControlName="descripcion">
+    </div>
+    <div>
+      <p>Precio de venta</p>
+      <input type="number" class="w-full text-right py-4  p-2" formControlName="precio_venta" />
+    </div>
+    <div class="mt-4">
+      <p>Categorias</p>
+      <mat-form-field appearance="fill" class="self-center">
+        <mat-label>Categorias</mat-label>
+        <mat-select multiple formControlName="categorias">
+          <mat-option *ngFor="let categoria of categorias" [value]="categoria.id">
+            {{categoria.nombre}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="flex justify-center col-span-2">
+      <button mat-raised-button color="primary" class="w-full " (click)="editarArticulo()">
+        <!-- Math add icon -->
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </form>
+</div>

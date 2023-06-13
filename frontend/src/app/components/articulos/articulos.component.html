@@ -2,68 +2,51 @@
   <h1>Articulos</h1>
   <!-- Crud con nombre, descripcion, precio de venta y un multiselect de categorias -->
   <div class="flex flex-col gap-4 justify-center">
-    <form [formGroup]="articuloForm" class="flex  gap-4 items-center">
-      <div>
-        <p>Nombre</p>
-        <input type="text" class="w-full p-2 py-4" formControlName="nombre">
+    <div>
+      <div class="bg-gray-600 flex justify-center">
+        <button mat-icon-button color="primary" matTooltip="Crear articulo" type="button" (click)="crearArticulo()">
+          <mat-icon>add</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" matTooltip="Ver lotes" type="button" (click)="verLotes()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" matTooltip="Editar articulo" type="button" (click)="editarArticulo()">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="primary" matTooltip="Eliminar articulo" type="button"
+          (click)="eliminarArticulo()">
+          <mat-icon>delete</mat-icon>
+        </button>
       </div>
-      <div>
-        <p>Descripción</p>
-        <input type="text" class="w-full  p-2 py-4" formControlName="descripcion">
-      </div>
-      <div>
-        <p>Precio de venta</p>
-        <input type="number" class="w-full text-right py-4  p-2" formControlName="precio_venta" />
-      </div>
-      <div class="mt-4">
-        <p>Categorias</p>
-        <mat-form-field appearance="fill" class="self-center">
-          <mat-label>Categorias</mat-label>
-          <mat-select multiple formControlName="categorias">
-            <mat-option *ngFor="let categoria of categorias" [value]="categoria.id">
-              {{categoria.nombre}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <div class="flex justify-center col-span-2">
-        <button mat-raised-button color="primary" class="w-full " (click)="crearArticulo()">{{titulo}}</button>
-      </div>
-    </form>
-    <!-- Tabla de articulos -->
-    <p-table [value]="articulos" [paginator]="true" [rows]="10" [responsive]="true" [columns]="cols">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Nombre</th>
-          <th>Descripción</th>
-          <th>Precio de venta</th>
-          <th>stock</th>
-          <th>Categorias</th>
-          <th>Acciones</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-articulo>
-        <tr>
-          <td>{{articulo.nombre}}</td>
-          <td>{{articulo.descripcion}}</td>
-          <td>{{articulo.precio}}</td>
-          <td>{{articulo.stock}}</td>
-          <td>
-            <ul>
-              <li>{{ listarCategorias(articulo) }}</li>
-            </ul>
-          </td>
-          <td>
-            <button mat-icon-button color="primary" (click)="editarArticulo(articulo)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" (click)="eliminarArticulo(articulo)">
-              <mat-icon>delete</mat-icon>
-            </button>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+      <!-- Selectable -->
+      <p-table selectionMode="single" [(selection)]="selected" [value]="articulos" [paginator]="true" [rows]="10"
+        [responsive]="true" [columns]="cols">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio de venta</th>
+            <th>stock</th>
+            <th>Categorias</th>
+
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-articulo>
+          <tr [pSelectableRow]="articulo">
+            <td>{{articulo.nombre}}</td>
+            <td>{{articulo.descripcion}}</td>
+            <td>{{articulo.precio}}</td>
+            <td>{{articulo.stock}}</td>
+            <td>
+              <ul>
+                <li>{{ listarCategorias(articulo) }}</li>
+              </ul>
+            </td>
+
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
 
 </div>

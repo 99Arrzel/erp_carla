@@ -195,7 +195,7 @@ export class ReportesComponent {
     this.id_moneda_es = moneda.source.value.id;
   };
   verReporteES = () => {
-    const url = "http://localhost:8080/jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteEstadoResultados&standAlone=true";
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteEstadoResultados&standAlone=true";
     abrirReporte({
       baseUrlReporte: url,
       parameters: {
@@ -203,11 +203,27 @@ export class ReportesComponent {
         id_gestion: this.id_gestion_es.toString(),
       }
     });
-
-  }
-
-
-    ;
+  };
+  //BG
+  //Ahora ES
+  id_gestion_bg = 0;
+  setActionGestionBG = (gestion: any) => {
+    this.id_gestion_bg = gestion.source.value.id;
+  };
+  id_moneda_bg = 0;
+  setActionMonedaBG = (moneda: any) => {
+    this.id_moneda_bg = moneda.source.value.id;
+  };
+  verReporteBG = () => {
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteBalanceGeneral&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_moneda: this.id_moneda_bg.toString(),
+        id_gestion: this.id_gestion_bg.toString(),
+      }
+    });
+  };
   verReporteSS = () => {
     const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteSumasSaldo&standAlone=true";
     abrirReporte({

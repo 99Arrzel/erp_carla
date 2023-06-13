@@ -10,6 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 public class ReporteEstadoResultadosModel {
+
+    public String empresa;
+    public String usuario;
     public Date fecha;
     public List<EstadoResultado> ingresos;
     public Float total_ingresos;
@@ -18,4 +21,6 @@ public class ReporteEstadoResultadosModel {
     public List<EstadoResultado> gastos;
     public Float total_gastos;
     public Float utilidad_operativa; // ingresos - costos - gastos
+    public Float utilidad_bruta; // ingresos - costos
+    public String moneda;
 }

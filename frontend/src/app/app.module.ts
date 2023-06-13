@@ -54,6 +54,9 @@ import { CalendarModule } from 'primeng/calendar';
 import { VerNotaCompraComponent } from './components/notas-compra/ver-nota-compra/ver-nota-compra.component';
 import { VerNotaVentaComponent } from './components/notas-venta/ver-nota-venta/ver-nota-venta.component';
 import { TabViewModule } from 'primeng/tabview';
+import { CrearArticuloModalComponent } from './components/articulos/crear-articulo-modal/crear-articulo-modal.component';
+import { EditarArticuloModalComponent } from './components/articulos/editar-articulo-modal/editar-articulo-modal.component';
+import { LotesArticuloModalComponent } from './components/articulos/lotes-articulo-modal/lotes-articulo-modal.component';
 
 
 
@@ -105,6 +108,9 @@ export function handleMsgError(e: HttpErrorResponse) {
     CrearNotaVentaComponent,
     VerNotaCompraComponent,
     VerNotaVentaComponent,
+    CrearArticuloModalComponent,
+    EditarArticuloModalComponent,
+    LotesArticuloModalComponent,
 
 
   ],
