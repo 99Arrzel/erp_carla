@@ -336,7 +336,7 @@ export class ReportesComponent {
       parameters: {
         id_categoria: this.categoria.id.toString(),
         stock: this.reporteStock.value.stock,
-        token: localStorage.getItem("token") as string
+
       }
     });
   };

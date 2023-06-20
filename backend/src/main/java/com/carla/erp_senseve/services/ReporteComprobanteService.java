@@ -294,6 +294,12 @@ public class ReporteComprobanteService {
 
                         detalles.add(nuevoDetalleComprobante);
                     });
+                    //Totales a 0
+                    saldo.set(0f);
+                    totalHaber.set(0f);
+                    totalDebe.set(0f);
+
+
                     nuevoDetalle.setDetalles(detalles);
                     detallesLibroMayor.add(nuevoDetalle);
                 }
