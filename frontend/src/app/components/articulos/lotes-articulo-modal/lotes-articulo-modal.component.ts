@@ -10,6 +10,13 @@ export class LotesArticuloModalComponent {
 
   ngOnInit(): void {
     console.log(this.data.articulo);
+    /* Editar data articulo lotes, en estado, si stock == 0 cambiar a "AGOTADO" */
+    this.data.articulo.lotes.forEach((lote: any) => {
+      if (lote.stock == 0) {
+        lote.estado = "AGOTADO";
+      }
+    }
+    );
   }
 
   constructor(

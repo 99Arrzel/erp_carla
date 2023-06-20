@@ -55,21 +55,27 @@ export class MonedasComponent {
         this.monedaForm.get('monedaPrincipal')?.setValue(nMon);
         /* Logeamos que carajos quedo */
       }
+      console.log(data, "Data");
+      /* Si data es mayor a 1 */
+
+
+
       console.log(this.monedaForm.get('monedaPrincipal')?.value, "Moneda principal");
       const ultimo = data[data.length - 1];
       console.log("Ultimo cambio", ultimo, "Datos");
       this.moneda_alternativa = ultimo.moneda_alternativa_id;
+      this.moneda_principal = ultimo.moneda_principal_id;
       this.monedaForm.patchValue({
         cambio: ultimo.cambio
       });
-      console.log(this.monedas, "Las monedas dispo");
+      console.log(this.monedas, "Las monedas dispo x2");
       this.cambios = data.filter((cambio) => {
         return cambio.cambio != null;
       }).reverse();
-
-
     });
   }
+
+  moneda_principal: any | null = null;
   fetchMonedas() {
     this.http.get<Moneda[]>(`${hostUrl}/api/moneda/usuario`, {
       headers: {
@@ -80,8 +86,21 @@ export class MonedasComponent {
       this.monedas = data.filter((moneda) => {
         return moneda.id != this.monedaForm.get('monedaPrincipal')?.value?.id;
       });
+
+      if (this.moneda_alternativa != null) {
+        this.monedas = this.monedas.filter((moneda) => {
+          return moneda.id == this.moneda_alternativa;
+        });
+      }
+      /* Además, si existe ya un tipo de cambio, el alternativo se vuelve solo 1 */
+      console.log(data.filter((moneda) => {
+        return moneda.id != this.monedaForm.get('monedaPrincipal')?.value?.id;
+      }), "Las monedas dispo");
+
+
       const ultimo = this.monedas.find((moneda) => { return moneda.id == this.moneda_alternativa; });
       this.monedaForm.get('monedaAlternativa')?.setValue(ultimo as Moneda || null);
+
     });
   }
 
@@ -92,6 +111,21 @@ export class MonedasComponent {
   }
 
   crear() {
+    /* Checkear que no es igual al último, en el cambio, no en la moneda*/
+    /* Buscamos el activo */
+    const activo = this.cambios.find((cambio) => {
+      return cambio.estado;
+    });
+    console.log(activo);
+    /* Checkear que no es el mismo camibo que el último */
+
+    if (activo?.cambio == this.monedaForm.get('cambio')?.value && activo?.moneda_alternativa_id == this.monedaForm.get('monedaAlternativa')?.value?.id) {
+      Notify.failure("El cambio no puede ser el mismo que el último");
+      return;
+    }
+
+
+
     if (this.monedaForm.valid) {
       this.http.post(`${hostUrl}/api/moneda_empresa/insertar`, {
         moneda_principal_id: this.monedaForm.get('monedaPrincipal')?.value?.id,

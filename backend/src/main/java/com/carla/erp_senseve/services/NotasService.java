@@ -14,6 +14,8 @@ import java.util.List;
 @Service
 public class NotasService {
     @Autowired
+    PeriodoRepository periodoRepository;
+    @Autowired
     NotasRepository notasRepository;
     @Autowired
     ArticuloService articuloService;
@@ -493,9 +495,14 @@ public class NotasService {
     }
 
     public NotaModel anular_venta(String notaId) {
+
+
         NotaModel nota = notasRepository.findById(Long.parseLong(notaId)).orElseThrow(
                 () -> new RuntimeException("Nota no encontrada")
         );
+        //Chequear si el periodo o gestión está cerrado
+
+
         if (nota.getEstado().equals("Anulado")) {
             throw new RuntimeException("Nota ya anulada");
         }

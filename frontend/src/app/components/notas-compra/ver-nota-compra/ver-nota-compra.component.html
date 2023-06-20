@@ -25,7 +25,7 @@
     </div>
     <!-- Boton -->
     <div>
-      <button mat-raised-button color="warn" [disabled]="nota?.estado == 'ANULADO'"
+      <button mat-raised-button color="warn" [disabled]="nota?.estado == 'ANULADO' || nota?.estado == 'Anulado'"
         (click)="anularNota()">Anular</button>
     </div>
     <!-- Terciary button go back -->

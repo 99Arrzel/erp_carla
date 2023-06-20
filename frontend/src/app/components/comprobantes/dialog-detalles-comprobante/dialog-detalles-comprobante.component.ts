@@ -33,7 +33,11 @@ export class DialogDetallesComprobanteComponent {
   ngOnInit(): void {
     console.log(this.data.comprobante, "Datos del comp");
     this.comprobante = this.data.comprobante;
-    this.detallesComprobante = this.data.comprobante.detalles;
+    /* Order by id array */
+    //this.detallesComprobante = this.data.comprobante.detalles
+    this.detallesComprobante = this.data.comprobante.detalles.sort((a: any, b: any) => {
+      return a.id - b.id;
+    });
   }
   constructor(
     public dialogRef: MatDialogRef<DialogDetallesComprobanteComponent>,

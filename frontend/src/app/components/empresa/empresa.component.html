@@ -1,7 +1,7 @@
-<div class="flex h-screen w-screen bg-gray-500">
+<div class="flex h-full w-screen bg-gray-500">
   <div class="w-80 bg-gray-400 w-min-80">
 
-    <div class="grid grid-cols-1 justify-center gap-2">
+    <div class="grid grid-cols-1 gap-2">
       <div class="bg-gray-800 pt-4 grid grid-cols-12 justify-center align-middle">
         <button class="text-white text-center hover:text-red-500 p-2 pb-4" (click)="goEmpresas()">
           <mat-icon>arrow_back</mat-icon>
@@ -9,21 +9,31 @@
         <h1 class="col-span-11 text-white text-center">{{empresa.nombre}}</h1>
       </div>
       <a class="w-full bg-gray-700 px-4 text-2xl">Contabilidad </a>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="reportes()">Reportes</a></button>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="gestiones()">Gestiones</a></button>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="cuentas()">Cuentas</a></button>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="comprobantes()">Comprobantes</a></button>
-      <a class="w-full bg-gray-700 px-4 text-2xl">Productos </a>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="articulos()">Articulos</a></button>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="categorias()">Categorias</a></button>
+      <button class="text-left pl-5"><a class=" text-2xl px-4 hover:bg-gray-600"
+          (click)="reportes()">Reportes</a></button>
+
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600" (click)="cuentas()">Cuentas</a></button>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600"
+          (click)="comprobantes()">Comprobantes</a></button>
+
+
       <a class="w-full bg-gray-700 px-4 text-2xl">Configuración </a>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="monedas()">Monedas</a></button>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="integracion()">Cuentas Integracion</a></button>
-      <a class="w-full bg-gray-700 px-4 text-2xl">Notas </a>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="notas_compra()">Notas Compra</a></button>
-      <button><a class="text-2xl px-4 hover:bg-gray-600" (click)="notas_venta()">Notas Venta</a></button>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600"
+          (click)="gestiones()">Gestiones</a></button>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600" (click)="monedas()">Monedas</a></button>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600" (click)="integracion()">Cuentas
+          Integracion</a></button>
+      <a class="w-full bg-gray-700 px-4 text-2xl">Inventario </a>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600"
+          (click)="articulos()">Articulos</a></button>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600"
+          (click)="categorias()">Categorias</a></button>
+      <button class="text-left pl-5"><a class="text-2xl  px-4 hover:bg-gray-600" (click)="notas_compra()">Notas
+          Compra</a></button>
+      <button class="text-left pl-5"><a class="text-2xl px-4 hover:bg-gray-600" (click)="notas_venta()">Notas
+          Venta</a></button>
       <a class="w-full bg-gray-700 px-4 text-2xl">Usuario </a>
-      <button>
+      <button class="text-left pl-5">
         <a class=" text-2xl p-4 hover:text-red-500 hover:bg-gray-600" (click)="cerrarSesion()">Cerrar
           sesión</a>
       </button>

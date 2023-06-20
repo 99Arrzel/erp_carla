@@ -17,4 +17,5 @@ public class ReporteBalanceGeneralModel {
     public String gestion;
     public Date gestion_inicio;
     public Date gestion_fin;
+    public Float total_pasivo_patrimonio;
 }

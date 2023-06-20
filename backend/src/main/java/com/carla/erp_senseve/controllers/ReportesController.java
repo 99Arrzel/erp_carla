@@ -166,4 +166,22 @@ public class ReportesController {
             return ResponseEntity.badRequest().body(e.getMessage().toString());
         }
     }
+
+    //Articulos de bajo stock, recibe id_categoria y stock menor o igual (numero)
+    @PostMapping(value = "/articulos-bajo-stock", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<?> articulos_bajo_stock(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestParam Map<String, String> data
+    ) {
+        try {
+            System.out.println(data.get("id_categoria"));
+            System.out.println(data.get("stock"));
+            ArticuloBajoStockModel reporte = reporteComprobanteService.articulos_bajo_stock(data.get("id_categoria"), data.get("stock"));
+            return ResponseEntity.ok().body(reporte);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage().toString());
+        }
+    }
+
 }

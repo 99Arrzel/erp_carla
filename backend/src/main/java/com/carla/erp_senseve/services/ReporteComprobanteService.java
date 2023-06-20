@@ -1,8 +1,11 @@
 package com.carla.erp_senseve.services;
 
+import com.carla.erp_senseve.controllers.ArticuloBajoStockModel;
+import com.carla.erp_senseve.controllers.ArticulosBajoStock;
 import com.carla.erp_senseve.controllers.EstadoResultado;
 import com.carla.erp_senseve.controllers.ReporteEstadoResultadosModel;
 import com.carla.erp_senseve.models.*;
+import com.carla.erp_senseve.repositories.CategoriaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,8 @@ public class ReporteComprobanteService {
     CuentaService cuentaService;
     @Autowired
     PeriodoService periodoService;
+    @Autowired
+    CategoriaRepository categoriaRepository;
 
     public ReporteComprobanteModel reporte_comprobante(String id_comprobante) {
         ReporteComprobanteModel reporteComprobanteModel = new ReporteComprobanteModel();
@@ -129,7 +134,7 @@ public class ReporteComprobanteService {
         reporteComprobanteModel.setTipo(comprobanteModel.getTipo());
         reporteComprobanteModel.setFecha(comprobanteModel.getFecha());
         reporteComprobanteModel.setGlosa(comprobanteModel.getGlosa());
-        reporteComprobanteModel.setMoneda(comprobanteModel.getMoneda().getNombre());
+        reporteComprobanteModel.setMoneda(moneda.getNombre());
         reporteComprobanteModel.setUsuario(comprobanteModel.getUsuario().getNombre());
         reporteComprobanteModel.setEmpresa(comprobanteModel.getEmpresa().getNombre());
         reporteComprobanteModel.setCambio(comprobanteModel.getTc());
@@ -146,6 +151,9 @@ public class ReporteComprobanteService {
         PeriodoModel periodo = null;
 
         MonedaModel moneda = monedaService.obtenerMoneda(Long.parseLong(idMoneda));
+        System.out.println(idMoneda);
+        System.out.println(moneda.getId());
+        System.out.println(moneda.getNombre());
         periodo = periodoService.obtenerPeriodo(Long.parseLong(idPeriodo));
         if (periodo == null) {
             throw new RuntimeException("No existe el periodo");
@@ -511,6 +519,7 @@ public class ReporteComprobanteService {
         ReporteBalanceGeneralModel reporteBalanceGeneralModel = new ReporteBalanceGeneralModel();
         List<CuentaParaReporteBalanceInicial> cuentas_balance_inicial = new ArrayList<>();
 
+
         cuentas.forEach(cuenta -> {
             CuentaParaReporteBalanceInicial cuentaParaReporteBalanceInicial1 = new CuentaParaReporteBalanceInicial();
             cuentaParaReporteBalanceInicial1.setId(cuenta.getId());
@@ -605,8 +614,60 @@ public class ReporteComprobanteService {
                 }
             }
         }
+        //suma de pasivo y patrimonio
+        Float total_pasivo_patrimonio = 0f;
+        for (CuentaParaReporteBalanceInicial cuenta : cuentas_balance_inicial) {
+            if (cuenta.getCodigo().startsWith("2.0.0") || cuenta.getCodigo().startsWith("3.0.0")) {
+                total_pasivo_patrimonio += cuenta.getSaldo();
+            }
+        }
+        reporteBalanceGeneralModel.setTotal_pasivo_patrimonio(total_pasivo_patrimonio);
 
 
         return reporteBalanceGeneralModel;
+    }
+
+    public ArticuloBajoStockModel articulos_bajo_stock(String idCategoria, String stock) {
+        //fetch articulos con stock menor a stock y categoria
+        if (idCategoria == null) {
+            throw new RuntimeException("idCategoria no puede ser null");
+        }
+        if (stock == null) {
+            throw new RuntimeException("stock no puede ser null");
+        }
+
+
+        CategoriaModel categoria = categoriaRepository.findById(Long.parseLong(idCategoria)).get();
+
+        if (categoria == null) {
+            throw new RuntimeException("Categoria no encontrada");
+        }
+
+        //get articulos de categoria y filter por stock
+        List<ArticuloModel> arts = categoria.getArticulos();
+        //        .stream()
+        //       .filter(articulo -> articulo.getStock() < Float.parseFloat(stock))
+        //        .collect(Collectors.toList());
+        //Alternative with removeif
+        arts.removeIf(articulo -> articulo.getStock() > Float.parseFloat(stock));
+
+        System.out.println("arts: " + arts.size());
+
+        ArticuloBajoStockModel articuloBajoStockModel = new ArticuloBajoStockModel();
+        articuloBajoStockModel.setCategoria(categoria.getNombre());
+        articuloBajoStockModel.setEmpresa(categoria.getEmpresa().getNombre());
+        articuloBajoStockModel.setUsuario(categoria.getEmpresa().getUsuario().getNombre());
+        List<ArticulosBajoStock> articulosBajoStock = new ArrayList<>();
+        arts.forEach(articulo -> {
+            ArticulosBajoStock articulosBajoStock1 = new ArticulosBajoStock();
+            articulosBajoStock1.setNombre(articulo.getNombre());
+            articulosBajoStock1.setPrecio(articulo.getPrecio());
+            System.out.println("articulo.getPrecio(): " + articulo.getPrecio());
+            articulosBajoStock1.setDescripcion(articulo.getDescripcion());
+            articulosBajoStock1.setCantidad(Float.valueOf(articulo.getStock()));
+            articulosBajoStock.add(articulosBajoStock1);
+        });
+        articuloBajoStockModel.setArticulos(articulosBajoStock);
+        return articuloBajoStockModel;
     }
 }

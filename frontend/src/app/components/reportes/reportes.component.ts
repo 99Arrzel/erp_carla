@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Moneda } from '../home/dialog-empresa/dialog-empresa.component';
 import { Notify } from 'notiflix';
 import { MenuItem } from 'primeng/api';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-reportes',
@@ -64,6 +65,7 @@ export class ReportesComponent {
         traer_todo: this.todo_ld.toString(),
         todos: this.todo_ld.toString(),
         todo: this.todo_ld.toString(),
+
       }
     });
   };
@@ -114,50 +116,72 @@ export class ReportesComponent {
   };
   cambiarPeriodos = (gestion: any) => {
     //Cambias los periodos a los periodos de la gestion seleccionada
+    console.log(gestion);
     this.periodos = gestion.periodos;
   };
   setActionGestionBI = (gestion: any) => {
-    this.id_gestion_bi = gestion.source.value.id;
+    if (gestion.isUserInput) {
+      this.id_gestion_bi = gestion.source.value.id;
+    }
   };
   id_gestion_ld = 0;
   setActionGestionLD = (gestion: any) => {
-    this.id_gestion_bi = gestion.source.value.id;
-    this.periodosLD = gestion.source.value.periodos;
+    if (gestion.isUserInput) {
+      this.id_gestion_bi = gestion.source.value.id;
+      this.periodosLD = gestion.source.value.periodos;
+    }
   };
   periodosLD: any = [];
   id_periodo_ld = 0;
   setActionPeriodoLD = (periodo: any) => {
-    this.id_periodo_ld = periodo.source.value.id;
+    if (periodo.isUserInput) {
+      this.id_periodo_ld = periodo.source.value.id;
+    }
   };
   id_moneda_ld = 0;
   setActionMonedaLD = (moneda: any) => {
-    this.id_moneda_ld = moneda.source.value.id;
+    if (moneda.isUserInput) {
+      console.log(moneda, "LD changed");
+      console.log(moneda.source.value.id, "LD changed");
+      this.id_moneda_ld = moneda.source.value.id;
+    }
   };
   todo_ld = "SI";
   setActionTodoLD = (todo: any) => {
-    console.log(todo.source.value); //?????????
-    this.todo_ld = todo.source.value;
+    if (todo.isUserInput) {
+      console.log(todo.source.value); //?????????
+      this.todo_ld = todo.source.value;
+    }
   };
 
   /* LM */
   id_gestion_lm = 0;
   setActionGestionLM = (gestion: any) => {
-    this.id_gestion_lm = gestion.source.value.id;
-    this.periodosLM = gestion.source.value.periodos;
+    console.log(gestion, "Gestion changed");
+    if (gestion.isUserInput) {
+      this.id_gestion_lm = gestion.source.value.id;
+      this.periodosLM = gestion.source.value.periodos;
+    }
   };
   periodosLM: any = [];
   id_periodo_lm = 0;
   setActionPeriodoLM = (periodo: any) => {
-    this.id_periodo_lm = periodo.source.value.id;
+    if (periodo.isUserInput) {
+      this.id_periodo_lm = periodo.source.value.id;
+    }
   };
   id_moneda_lm = 0;
   setActionMonedaLM = (moneda: any) => {
-    this.id_moneda_lm = moneda.source.value.id;
+    if (moneda.isUserInput) {
+      this.id_moneda_lm = moneda.source.value.id;
+    }
   };
   todo_lm = "SI";
   setActionTodoLM = (todo: any) => {
-    console.log(todo.source.value); //?????????
-    this.todo_lm = todo.source.value;
+    if (todo.isUserInput) {
+      console.log(todo.source.value); //?????????
+      this.todo_lm = todo.source.value;
+    }
   };
   verReporteLM = () => {
     const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteLibroMayor&standAlone=true";
@@ -179,20 +203,28 @@ export class ReportesComponent {
   id_gestion_ss = 0;
 
   setActionGestionSS = (gestion: any) => {
-    this.id_gestion_ss = gestion.source.value.id;
+    if (gestion.isUserInput) {
+      this.id_gestion_ss = gestion.source.value.id;
+    }
   };
   id_moneda_ss = 0;
   setActionMonedaSS = (moneda: any) => {
-    this.id_moneda_ss = moneda.source.value.id;
+    if (moneda.isUserInput) {
+      this.id_moneda_ss = moneda.source.value.id;
+    }
   };
   //Ahora ES
   id_gestion_es = 0;
   setActionGestionES = (gestion: any) => {
-    this.id_gestion_es = gestion.source.value.id;
+    if (gestion.isUserInput) {
+      this.id_gestion_es = gestion.source.value.id;
+    }
   };
   id_moneda_es = 0;
   setActionMonedaES = (moneda: any) => {
-    this.id_moneda_es = moneda.source.value.id;
+    if (moneda.isUserInput) {
+      this.id_moneda_es = moneda.source.value.id;
+    }
   };
   verReporteES = () => {
     const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteEstadoResultados&standAlone=true";
@@ -208,11 +240,15 @@ export class ReportesComponent {
   //Ahora ES
   id_gestion_bg = 0;
   setActionGestionBG = (gestion: any) => {
-    this.id_gestion_bg = gestion.source.value.id;
+    if (gestion.isUserInput) {
+      this.id_gestion_bg = gestion.source.value.id;
+    }
   };
   id_moneda_bg = 0;
   setActionMonedaBG = (moneda: any) => {
-    this.id_moneda_bg = moneda.source.value.id;
+    if (moneda.isUserInput) {
+      this.id_moneda_bg = moneda.source.value.id;
+    }
   };
   verReporteBG = () => {
     const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FReporteBalanceGeneral&standAlone=true";
@@ -240,7 +276,9 @@ export class ReportesComponent {
 
 
   setActionMonedaBI = (moneda: any) => {
-    this.id_monedaa_bi = moneda.source.value.id;
+    if (moneda.isUserInput) {
+      this.id_monedaa_bi = moneda.source.value.id;
+    }
   };
   setActionTodo = (todo: any) => {
     if (this.todo == "SI") {
@@ -259,9 +297,57 @@ export class ReportesComponent {
   gestiones: any = [];
   periodos: any = [];
   empresa: any = null;
+  setActionStock = (stock: any) => {
+    console.log(stock);
+    if (stock.isUserInput) {
+      console.log(stock.source.value, "Stock changedxxxx");
+      this.stock = stock.source.value;
+    }
+  };
+  categorias: any = [];
+  stock = 0;
+  categoria: any = null;
+  setActionCategoria = (categoria: any) => {
+    console.log(categoria, "Categoria changed");
+    if (categoria.isUserInput) {
+      this.categoria = categoria.source.value;
+    }
+  };
+  formGroup = new FormGroup({
+    stock: new FormControl(''),
+  });
+  reporteStock = new FormGroup({
+    stock: new FormControl(''),
+  });
+  verReportABS = () => {
+    if (this.categoria == null) {
+      Notify.failure("Seleccione una categoria");
+      return;
+    }
+    if (this.reporteStock.value.stock == null) {
+      Notify.failure("Ingrese un stock");
+      return;
+    }
+
+
+    const url = "jasperserver/flow.html?_flowId=viewReportFlow&_flowId=viewReportFlow&ParentFolderUri=%2FReportes&reportUnit=%2FReportes%2FArticuloBajoStock&standAlone=true";
+    abrirReporte({
+      baseUrlReporte: url,
+      parameters: {
+        id_categoria: this.categoria.id.toString(),
+        stock: this.reporteStock.value.stock,
+        token: localStorage.getItem("token") as string
+      }
+    });
+  };
+
+
+
   setearPeriodo = (cambio: any) => {
-    console.log(cambio.source.value.peridos);
-    this.periodos = cambio.source.value.periodos;
+    if (cambio.isUserInput) {
+      console.log(cambio.source.value.peridos);
+      this.periodos = cambio.source.value.periodos;
+    }
   };
   updateGestiones() {
     let id = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
@@ -274,6 +360,15 @@ export class ReportesComponent {
         console.log(data, "la data");
         this.empresa = data;
         this.gestiones = data.gestiones;
+
+        /* Obtenemos la moneda activa de empresa*/
+        let monedaActual = data.monedas.find((moneda: any) => {
+          return moneda.estado;
+        });
+        console.log(monedaActual, "Moneda actual");
+        this.monedas = this.monedas.filter((moneda: any) => {
+          return moneda.id == monedaActual.moneda_alternativa_id || moneda.id == monedaActual.moneda_principal_id;
+        });
       });
 
   }
@@ -289,10 +384,33 @@ export class ReportesComponent {
     });
   }
 
+
+
+  fetchCategorias() {
+    let id = this.route.parent?.snapshot.paramMap.get('id') as unknown as number;
+    this.http.post(`${hostUrl}/api/categoria/listar`, {
+      empresa_id: id
+    }, {
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("token")
+      }
+    }).subscribe({
+      next: (data: any) => {
+        console.log(data, "Data");
+        this.categorias = data;
+      },
+      error: (e) => {
+        console.error(e);
+
+      }
+    });
+  }
+
   ngOnInit(): void {
     /* Fetch gestiones */
     this.fetchMonedas();
     this.updateGestiones();
+    this.fetchCategorias();
     console.log(this.items[0]);
     console.log(this.activeItem);
   };

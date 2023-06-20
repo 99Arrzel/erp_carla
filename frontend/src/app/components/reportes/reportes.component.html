@@ -207,5 +207,29 @@
         </button>
       </div>
     </p-tabPanel>
+    <p-tabPanel header="Bajo stock">
+      <p>Bajo stock</p>
+      <!-- Dropdown -->
+      <form class="flex gap-2" [formGroup]="reporteStock">
+        <mat-form-field appearance="fill">
+          <mat-label>Categoria</mat-label>
+          <mat-select>
+            <mat-option *ngFor="let categoria of categorias" [value]="categoria"
+              (onSelectionChange)="setActionCategoria($event)">
+              {{ categoria?.nombre  }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <!-- input number para articulos size, o sea stock, number, integer -->
+        <mat-form-field appearance="fill">
+          <mat-label>Stock</mat-label>
+          <input matInput type="number" placeholder="Stock" formControlName="stock">
+        </mat-form-field>
+        <button mat-icon-button color="primary" matTooltip="Ver reporte" type="button" (click)="verReportABS()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </form>
+    </p-tabPanel>
   </p-tabView>
 </div>

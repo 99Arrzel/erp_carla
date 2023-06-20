@@ -76,7 +76,7 @@ export class ComprobantesComponent {
   };
   anularComprobante = () => {
     if (this.selectedComprobante != null) {
-      if (this.selectedComprobante.estado == "ANULADO") {
+      if (this.selectedComprobante.estado == "ANULADO" || this.selectedComprobante.estado == "Anulado") {
         Notify.failure("El comprobante ya está anulado");
         return;
       }
